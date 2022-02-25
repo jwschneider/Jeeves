@@ -54,6 +54,58 @@ namespace JeevesTest
 			Assert.AreEqual(2, head);
 			Assert.IsTrue(PQ.IsEmpty());
 		}
+		[TestMethod]
+		public void DominatingPriorityQueueCompareTest1()
+        {
+			int[] init = { 1, 2 };
+			DominatingPriorityQueue<int> PQ = new DominatingPriorityQueue<int>((x, y) => y - x);
+			init.ToList().ForEach(x => PQ.Insert(x));
+			int head = PQ.PullHead();
+			Assert.AreEqual(2, head);
+			head = PQ.PullHead();
+			Assert.AreEqual(1, head);
+			Assert.IsTrue(PQ.IsEmpty());
+		}
+		[TestMethod]
+		public void DominatingPriorityQueueDominatorTest1()
+        {
+			int[] init = { 1, 2 };
+			DominatingPriorityQueue<int> PQ = new DominatingPriorityQueue<int>(
+				(x, y) => x - y,
+				(x, y) => x == y);
+			init.ToList().ForEach(x => PQ.Insert(x));
+			int head = PQ.PullHead();
+			Assert.AreEqual(1, head);
+			head = PQ.PullHead();
+			Assert.AreEqual(2, head);
+			Assert.IsTrue(PQ.IsEmpty());
+		}
+		[TestMethod]
+		public void DominatingPriorityQueueDominatorTest2()
+		{
+			int[] init = { 1, 1 };
+			DominatingPriorityQueue<int> PQ = new DominatingPriorityQueue<int>(
+				(x, y) => x - y,
+				(x, y) => x == y);
+			init.ToList().ForEach(x => PQ.Insert(x));
+			int head = PQ.PullHead();
+			Assert.AreEqual(1, head);
+			Assert.IsTrue(PQ.IsEmpty());
+		}
+		[TestMethod]
+		public void DominatingPriorityQueueDominatorTest3()
+		{
+			int[] init = { 1, 3, 3 };
+			DominatingPriorityQueue<int> PQ = new DominatingPriorityQueue<int>(
+				(x, y) => x - y,
+				(x, y) => x == y);
+			init.ToList().ForEach(x => PQ.Insert(x));
+			int head = PQ.PullHead();
+			Assert.AreEqual(1, head);
+			head = PQ.PullHead();
+			Assert.AreEqual(3, head);
+			Assert.IsTrue(PQ.IsEmpty());
+		}
 	}
 }
 
