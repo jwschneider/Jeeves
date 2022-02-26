@@ -8,7 +8,7 @@ namespace Jeeves
     {
         public static IEnumerable<(Job, int)> Schedule(IEnumerable<Job> jobs, SetupTime setupTime)
         {
-            return CreatePotentialSchedules(new DominatingPriorityQueue<ScheduleState>(ScheduleState.init()), jobs, setupTime)
+            return CreatePotentialSchedules(new DominatingPriorityQueue<ScheduleState>(ScheduleState.init(), (s1, s2) => s1.TimeScheduled - s2.TimeScheduled), jobs, setupTime)
                 .MaxBy<ScheduleState, int>((ScheduleState state) => state.Value)
                 .StateToSchedule();
         }
@@ -32,16 +32,56 @@ namespace Jeeves
                     
             }
         }
-        public static bool HasChildren(this ScheduleState i, IEnumerable<Job> jobs, SetupTime setupTime)
+        public static bool HasChildren(this ScheduleState s, IEnumerable<Job> jobs, SetupTime setup)
         {
-            return false;
+            var (i, X, ti) = s;
+            if (i == null) return jobs.Any();
+            else
+            {
+                var F = RemainingCandidates(jobs, setup);
+                return F(i, ti).Except<Job>(X).Any();
+            }
         }
-        public static IEnumerable<ScheduleState> Children(this ScheduleState i, IEnumerable<Job> jobs, SetupTime setupTime)
+
+        public static IEnumerable<ScheduleState> Children(this ScheduleState s, IEnumerable<Job> jobs, SetupTime setup)
         {
-            return null;
+            var (i, X, ti) = s;
+            if (i == null)
+                return jobs.Select<Job, ScheduleState>(k =>
+                    {
+                        var tk = k.ReleaseTime;
+                        var Xk = new List<Job>().Append<Job>(k).Where<Job>(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
+                        var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);
+                        return new ScheduleState(k, Xk, tk, k.Value, null);
+                    });
+            else
+            {
+                var F = RemainingCandidates(jobs, setup);
+                return F(i, ti).Except<Job>(X).Select<Job, ScheduleState>(k =>
+                        {
+                            var tk = Math.Max(ti + i.ProcessTime, k.ReleaseTime);
+                            var Xk = X.Append<Job>(k).Where<Job>(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
+                            var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);  // implement weighted tardiness
+                            return new ScheduleState(k, Xk, tk, s.Value + k.Value, s);
+                        }
+                    );
+            }
         }
+        public static Func<Job, int, IEnumerable<Job>> RemainingCandidates(IEnumerable<Job> jobs, SetupTime setup) =>
+            (Job i, int ti) => jobs.Where<Job>(j => ti + i.ProcessTime + setup(i, j) <= j.Deadline - j.ProcessTime);
+        public static Dominator<ScheduleState> ScheduleStateDominator(SetupTime setup) =>
+            (ScheduleState s1, ScheduleState s2) =>
+            {
+                ((Job i1, IEnumerable<Job> X1, int ti1), (Job i2, IEnumerable<Job> X2, int ti2)) = (s1, s2);
+                return i1.Equals(i2)
+                    && ti1 <= ti2
+                    && X1.Subset<Job>(X2.Union<Job>(X1.Where<Job>((Job j) => j.Deadline - j.ProcessTime >= ti2 + i2.ProcessTime + setup(i2, j))));
+            };
         
+        public static bool Subset<T>(this IEnumerable<T> s1, IEnumerable<T> s2) =>
+            !s1.Except<T>(s2).Any<T>();
     }
+
 
     public delegate int SetupTime(Job i, Job j);
 
@@ -68,7 +108,12 @@ namespace Jeeves
         {
             return new ScheduleState(null, new List<Job>(), 0);
         }
-
+        public void Deconstruct(out Job i, out IEnumerable<Job> X, out int ti)
+        {
+            i = LastScheduled;
+            X = Exclude;
+            ti = TimeScheduled;
+        }
     }
 
     public class ScheduleStateComparer : IComparer<ScheduleState>

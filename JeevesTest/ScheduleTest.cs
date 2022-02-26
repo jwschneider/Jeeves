@@ -11,7 +11,7 @@ namespace JeevesTest
         [TestMethod]
         public void ExampleSchedule1()
         {
-            //job = {identifier, value, releaseTime, processTime, dueDate, deadLine}
+            //job = {identifier, value, releaseTime, processTime, dueDate, deadline}
             int[,] jobMatrix =
             {
                 {1, 2, 0, 3, 7, 8},
