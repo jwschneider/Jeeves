@@ -9,7 +9,9 @@ namespace Jeeves
         public static IEnumerable<(Job, int)> Schedule(IEnumerable<Job> jobs, SetupTime setupTime)
         {
             return CreatePotentialSchedules(new DominatingPriorityQueue<ScheduleState>(ScheduleState.init(), (s1, s2) => s1.TimeScheduled - s2.TimeScheduled), jobs, setupTime)
-                .MaxBy<ScheduleState, int>((ScheduleState state) => state.Value)
+                .GroupBy(state => state.Value)
+                .MaxBy(group => group.Key)
+                .MinBy(state => state.TimeScheduled + state.LastScheduled.ProcessTime)
                 .StateToSchedule();
         }
         
@@ -49,7 +51,7 @@ namespace Jeeves
             if (i == null)
                 return jobs.Select<Job, ScheduleState>(k =>
                     {
-                        var tk = k.ReleaseTime;
+                        var tk = Math.Max(setup(i, k), k.ReleaseTime);
                         var Xk = new List<Job>().Append<Job>(k).Where<Job>(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
                         var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);
                         return new ScheduleState(k, Xk, tk, k.Value, null);
@@ -59,7 +61,7 @@ namespace Jeeves
                 var F = RemainingCandidates(jobs, setup);
                 return F(i, ti).Except<Job>(X).Select<Job, ScheduleState>(k =>
                         {
-                            var tk = Math.Max(ti + i.ProcessTime, k.ReleaseTime);
+                            var tk = Math.Max(ti + i.ProcessTime + setup(i, k), k.ReleaseTime);
                             var Xk = X.Append<Job>(k).Where<Job>(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
                             var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);  // implement weighted tardiness
                             return new ScheduleState(k, Xk, tk, s.Value + k.Value, s);

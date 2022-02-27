@@ -21,7 +21,15 @@ namespace Jeeves
             DueDate = dueDate;
             Deadline = deadline;
         }
+        public static Job CreateJobFromArray(int[] array)
+        {
+            if (array.GetLength(0) != 6)
+            {
+                throw new ArgumentException($"Rows of input array are of incorrect length: {array.GetLength}");
+            }
+            return new Job(array[0], array[1], array[2], array[3], array[4], array[5]);
 
+        }
         // Array format for job is 6 columns: identity, value, releaseTime, processTime, dueDate, deadline
         public static List<Job> CreateJobsFromMatrix(int[,] matrix)
         {
