@@ -19,7 +19,7 @@ namespace Jeeves
         {
             return state == null ?
                 new List<(Job, int)>() :
-                StateToSchedule(state.Parent).Append<(Job, int)>((state.LastScheduled, state.TimeScheduled));
+                StateToSchedule(state.Parent).Append((state.LastScheduled, state.TimeScheduled));
         }
         public static IEnumerable<ScheduleState> CreatePotentialSchedules(DominatingPriorityQueue<ScheduleState> PQ, IEnumerable<Job> jobs, SetupTime setupTime)
         {
@@ -30,7 +30,7 @@ namespace Jeeves
                 ScheduleState head = PQ.PullHead();
                 return head.HasChildren(jobs, setupTime) ?
                     CreatePotentialSchedules(PQ + head.Children(jobs, setupTime), jobs, setupTime) :
-                    CreatePotentialSchedules(PQ, jobs, setupTime).Append<ScheduleState>(head);
+                    CreatePotentialSchedules(PQ, jobs, setupTime).Append(head);
                     
             }
         }
@@ -41,7 +41,7 @@ namespace Jeeves
             else
             {
                 var F = RemainingCandidates(jobs, setup);
-                return F(i, ti).Except<Job>(X).Any();
+                return F(i, ti).Except(X).Any();
             }
         }
 
@@ -49,20 +49,20 @@ namespace Jeeves
         {
             var (i, X, ti) = s;
             if (i == null)
-                return jobs.Select<Job, ScheduleState>(k =>
+                return jobs.Select(k =>
                     {
                         var tk = Math.Max(setup(i, k), k.ReleaseTime);
-                        var Xk = new List<Job>().Append<Job>(k).Where<Job>(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
+                        var Xk = new List<Job>().Append(k).Where(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
                         var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);
                         return new ScheduleState(k, Xk, tk, k.Value, null);
                     });
             else
             {
                 var F = RemainingCandidates(jobs, setup);
-                return F(i, ti).Except<Job>(X).Select<Job, ScheduleState>(k =>
+                return F(i, ti).Except(X).Select(k =>
                         {
                             var tk = Math.Max(ti + i.ProcessTime + setup(i, k), k.ReleaseTime);
-                            var Xk = X.Append<Job>(k).Where<Job>(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
+                            var Xk = X.Append(k).Where(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
                             var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);  // implement weighted tardiness
                             return new ScheduleState(k, Xk, tk, s.Value + k.Value, s);
                         }
@@ -70,18 +70,18 @@ namespace Jeeves
             }
         }
         public static Func<Job, int, IEnumerable<Job>> RemainingCandidates(IEnumerable<Job> jobs, SetupTime setup) =>
-            (Job i, int ti) => jobs.Where<Job>(j => ti + i.ProcessTime + setup(i, j) <= j.Deadline - j.ProcessTime);
+            (Job i, int ti) => jobs.Where(j => ti + i.ProcessTime + setup(i, j) <= j.Deadline - j.ProcessTime);
         public static Dominator<ScheduleState> ScheduleStateDominator(SetupTime setup) =>
             (ScheduleState s1, ScheduleState s2) =>
             {
                 ((Job i1, IEnumerable<Job> X1, int ti1), (Job i2, IEnumerable<Job> X2, int ti2)) = (s1, s2);
                 return i1.Equals(i2)
                     && ti1 <= ti2
-                    && X1.Subset<Job>(X2.Union<Job>(X1.Where<Job>((Job j) => j.Deadline - j.ProcessTime >= ti2 + i2.ProcessTime + setup(i2, j))));
+                    && X1.Subset(X2.Union(X1.Where((Job j) => j.Deadline - j.ProcessTime >= ti2 + i2.ProcessTime + setup(i2, j))));
             };
         
         public static bool Subset<T>(this IEnumerable<T> s1, IEnumerable<T> s2) =>
-            !s1.Except<T>(s2).Any<T>();
+            !s1.Except(s2).Any();
     }
 
 
