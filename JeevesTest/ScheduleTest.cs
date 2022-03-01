@@ -40,7 +40,7 @@ namespace JeevesTest
             CollectionAssert.AreEqual(scheduledJobs, solution);
         }
         [TestMethod]
-        public void CreatePotentialSchedulesTest1()
+        public void CreatePotentialSchedulesTest1_1()
         {
             Job j = Job.CreateJobFromArray(new int[] { 1, 1, 0, 1, 1, 3 });
             IEnumerable<ScheduleState> states = Scheduler.CreatePotentialSchedules(
@@ -63,6 +63,23 @@ namespace JeevesTest
             List<(Job, int)> scheduledJobs = Scheduler.Schedule(new List<Job>().Append(j), (x, y) => 0).ToList();
             List<(Job, int)> solution = new List<(Job, int)>(new (Job, int)[] { (j, 0) });
             CollectionAssert.AreEqual(solution, scheduledJobs);
+        }
+        [TestMethod]
+        public void CreatePotentialSchedulesTest2_1()
+        {
+            List<Job> jobs = Job.CreateJobsFromMatrix(
+                new int[,] { { 1, 1, 0, 1, 7, 8},
+                             { 2, 1, 2, 1, 7, 8}});
+            SetupTime setup = (i, j) => i == null ? 0 : 1;
+            IEnumerable<ScheduleState> states = Scheduler.CreatePotentialSchedules(
+                new DominatingPriorityQueue<ScheduleState>(ScheduleState.init(), (s1, s2) => s1.TimeScheduled - s2.TimeScheduled, Scheduler.ScheduleStateDominator(setup)),
+                jobs,
+                setup);
+            Assert.AreEqual(1, states.Count());
+            ScheduleState s = states.First();
+            Assert.AreEqual(jobs[1], s.LastScheduled, $"Last scheduled Job should have been 2 but was {s.LastScheduled.Identity}.");
+            Assert.AreEqual(2, s.TimeScheduled);
+            Assert.AreEqual(2, s.Value);
         }
     }
 }
