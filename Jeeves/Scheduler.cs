@@ -8,7 +8,13 @@ namespace Jeeves
     {
         public static IEnumerable<(Job, int)> Schedule(IEnumerable<Job> jobs, SetupTime setupTime)
         {
-            return CreatePotentialSchedules(new DominatingPriorityQueue<ScheduleState>(ScheduleState.init(), (s1, s2) => s1.TimeScheduled - s2.TimeScheduled), jobs, setupTime)
+            return CreatePotentialSchedules(
+                new DominatingPriorityQueue<ScheduleState>(
+                    ScheduleState.init(),
+                    (s1, s2) => s1.TimeScheduled - s2.TimeScheduled,
+                    ScheduleStateDominator(setupTime)),
+                jobs,
+                setupTime)
                 .GroupBy(state => state.Value)
                 .MaxBy(group => group.Key)
                 .MinBy(state => state.TimeScheduled + state.LastScheduled.ProcessTime)
