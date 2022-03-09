@@ -7,23 +7,35 @@ namespace Jeeves
 {
 	public static class MSGraph
 	{
-		public static IPublicClientApplication application { get; set; } = null;
-
-		public static IPublicClientApplication GetClientApp()
-        {
-			if (application == null)
-			{
-				MSGraphConfig config = MSGraphConfig.ReadFileFromJson("appsettings.json");
-				application = PublicClientApplicationBuilder.CreateWithApplicationOptions(config.ClientAppOptions)
-								.WithAuthority(new Uri(config.Authority))
-								.WithDefaultRedirectUri()
-								.Build();
+		public static MSGraphConfig config
+		{
+			get {
+				if (_config == null)
+                {
+					_config = MSGraphConfig.ReadFileFromJson("appsettings.json");
+                }
+				return _config;
 			}
-			return application;
+		}
+		public static IPublicClientApplication app
+        {
+			get
+            {
+				if (_app == null)
+                {
+					_app = PublicClientApplicationBuilder.CreateWithApplicationOptions(config.ClientAppOptions)
+							.WithDefaultRedirectUri()
+							.Build();
+                }
+				return _app;
+            }
         }
+		private static IPublicClientApplication _app = null;
+		private static MSGraphConfig _config = null;
+
 		public static async Task<AuthenticationResult> GetTokenAsync(IEnumerable<string> scope)
         {
-			return await GetTokenInteractiveAsync(GetClientApp(), scope);
+			return await GetTokenInteractiveAsync(app, scope);
 		}
 		private static async Task<AuthenticationResult> GetTokenInteractiveAsync(this IPublicClientApplication app, IEnumerable<string> scope)
         {
