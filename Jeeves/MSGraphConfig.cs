@@ -3,6 +3,7 @@ using Microsoft.Identity.Client;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Globalization;
+using System.Linq;
 
 namespace Jeeves
 {

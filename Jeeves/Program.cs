@@ -1,23 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Jeeves
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
-            UpdateAsync().Wait();
+            PeriodicUpdateAsync().Wait();
         }
-        static async Task UpdateAsync()
+        static async Task PeriodicUpdateAsync()
         {
-            List<Job> jobs = await PullJobsFromDatabase();
-            jobs = await LogAndRemoveCompletedJobs(jobs);
-            IEnumerable<(Job, int)> scheduledJobs = ScheduleJobs(jobs);
-            await PushScheduleToDatabase(scheduledJobs);
+            if (await DetectChangesAsync())
+            {
+                (await PullIncompleteJobsFromDatabaseAsync())
+                    .ScheduleJobs()
+                    .PushScheduleToDatabaseAsync();
+            }
         }
-        private static Task<List<Job>> PullJobsFromDatabase()
+
+        static async Task DailyUpdateAsync()
+        {
+
+        }
+
+        public static Task<bool> DetectChangesAsync()
+        {
+            return Task.Run(() => false);
+        }
+        private static async Task<IEnumerable<Job>> PullIncompleteJobsFromDatabaseAsync()
         {
             return null;
         }
@@ -25,13 +38,11 @@ namespace Jeeves
         {
             return null;
         }
-        private static IEnumerable<(Job, int)> ScheduleJobs(List<Job> jobs)
+        private static IEnumerable<(Job, int)> ScheduleJobs(this IEnumerable<Job> jobs) =>
+            Scheduler.Schedule(jobs, null);
+        private static async Task PushScheduleToDatabaseAsync(this IEnumerable<(Job, int)> jobs)
         {
-            return Scheduler.Schedule(jobs, null);
-        }
-        private static Task PushScheduleToDatabase(IEnumerable<(Job, int)> jobs)
-        {
-            return null;
+            
         }
     }
 }
