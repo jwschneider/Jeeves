@@ -9,38 +9,32 @@ namespace Jeeves
     {
         static void Main(string[] args)
         {
-            PeriodicUpdateAsync().Wait();
+            CloudInstance cloud = new CloudInstance();
+            PeriodicUpdateAsync(cloud).Wait();
+
         }
-        static async Task PeriodicUpdateAsync()
+        static async Task PeriodicUpdateAsync(CloudInstance cloud)
         {
-            if (await DetectChangesAsync())
+            if (await cloud.DetectChangesAsync())
             {
-                (await PullIncompleteJobsFromDatabaseAsync())
+                (await cloud.PullIncompleteJobsFromCloudAsync())
                     .ScheduleJobs()
-                    .PushScheduleToDatabaseAsync();
+                    .PushScheduleToCloudAsync();
             }
         }
 
-        static async Task DailyUpdateAsync()
+        static async Task DailyUpdateAsync(CloudInstance cloud)
         {
 
         }
 
-        public static Task<bool> DetectChangesAsync()
-        {
-            return Task.Run(() => false);
-        }
-        private static async Task<IEnumerable<Job>> PullIncompleteJobsFromDatabaseAsync()
-        {
-            return null;
-        }
         private static Task<List<Job>> LogAndRemoveCompletedJobs(List<Job> jobs)
         {
             return null;
         }
         private static IEnumerable<(Job, int)> ScheduleJobs(this IEnumerable<Job> jobs) =>
             Scheduler.Schedule(jobs, null);
-        private static async Task PushScheduleToDatabaseAsync(this IEnumerable<(Job, int)> jobs)
+        private static async Task PushScheduleToCloudAsync(this IEnumerable<(Job, int)> jobs)
         {
             
         }

@@ -52,14 +52,14 @@ namespace Jeeves
 			IAuthenticationProvider provider = new MSGraphAuth(scope);
 			client = new GraphServiceClient(provider);
         }
-		public async Task<User> GetUserAsync()
-        {
-			return await client.Me.Request().GetAsync();
-        }
 
         public async Task<bool> DetectChangesAsync()
         {
 			return false;
+        }
+		public async Task<IEnumerable<Job>> GetIncompleteJobsAsync()
+        {
+			return null;
         }
 		private async Task<TodoTaskList> GetTaskList(string listName)
         {
