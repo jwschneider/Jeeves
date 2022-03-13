@@ -1,0 +1,68 @@
+﻿{
+  "taskLists": [
+    {
+      "displayName": "The Pool",
+      "tasks": [
+        {
+          "title": "SampleChore1",
+          "dueDateTime": {
+            "dateTime": "2022-03-12T23:00:00",
+            "timeZone": "America/Chicago"
+          },
+          "extensions": {
+            "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
+            "$values": [
+              {
+                "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
+                "extensionName": "testExtension",
+                "additionalData": {
+                  "category": "Housework",
+                  "releaseDate": "2022-03-12T13:00:00Z",
+                  "processTime": "1:00:00"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "title": "SampleChore2",
+          "dueDateTime": {
+            "dateTime": "2022-03-15T23:00:00",
+            "timeZone": "America/Chicago"
+          },
+          "extensions": {
+            "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
+            "$values": [
+              {
+                "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
+                "extensionName": "testExtension",
+                "additionalData": {
+                  "category": "Housework",
+                  "releaseDate": "2022-03-12T13:00:00Z",
+                  "processTime": "2:00:00"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "displayName": "Today",
+      "tasks": [
+        {
+          "title": "TestTask"
+        }
+      ]
+    },
+    {
+      "displayName": "Tomorrow",
+      "tasks": []
+    },
+    {
+      "displayName": "Daily",
+      "tasks": []
+    }
+  ]
+}
+

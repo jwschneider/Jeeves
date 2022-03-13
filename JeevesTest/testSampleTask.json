@@ -1,0 +1,20 @@
+﻿{
+  "title": "TestSampleTask",
+  "dueDateTime": {
+    "dateTime": "2022-03-12T23:00:00",
+    "timeZone": "America/Chicago"
+  },
+  "extensions": {
+    "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
+    "$values": [
+      {
+        "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
+        "extensionName": "testExtension",
+        "additionalData": {
+          "extensionProperty1": "property1value",
+          "extensionProperty2": "property2value"
+        }
+      }
+    ]
+  }
+}
