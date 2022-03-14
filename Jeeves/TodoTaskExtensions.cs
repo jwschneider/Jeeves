@@ -26,6 +26,8 @@ namespace Jeeves
 			task.CreatedDateTime;
 		public static DateTimeTimeZone CompletedTime(this TodoTask task) =>
 			task.CompletedDateTime;
+		public static PatternedRecurrence Recurrence(this TodoTask task) =>
+			task.Recurrence;
 
 		private static OpenTypeExtension taskProperties(this TodoTask task) =>
 			task.Extensions.CurrentPage

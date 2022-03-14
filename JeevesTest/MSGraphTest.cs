@@ -34,8 +34,16 @@ namespace JeevesTest
 
 
 		}
+		public Func<TodoTask, bool> TaskIsNamed(string name) =>
+			(TodoTask task) => String.Equals(task.Title(), name);
+		public TodoTask GetTaskByName(string list, string name) =>
+			GetSampleTasks(GetSampleTaskLists(), list)
+				.Where(TaskIsNamed(name))
+				.FirstOrDefault();
+
+
 		[TestMethod]
-		public void MSGraphGetSampleDataTest0()
+		public void MSGraphGetSampleDataTest0_JsonToTask()
         {
 			string json = System.IO.File.ReadAllText("testSampleTask.json");
 			TodoTask task = JsonConvert.DeserializeObject<TodoTask>(json, new JsonSerializerSettings
@@ -45,7 +53,7 @@ namespace JeevesTest
 			Assert.IsNotNull(task);
         }
 		[TestMethod]
-		public void MSGraphGetSampleDataTest1()
+		public void MSGraphGetSampleDataTest1_TaskToJson()
         {
 			TodoTask task = new TodoTask
 			{
@@ -77,26 +85,46 @@ namespace JeevesTest
         }
 
 		[TestMethod]
-		public void MSGraphGetSampleDataTest2()
+		public void MSGraphGetSampleDataTest2_TaskFromJson()
         {
 			IEnumerable<TodoTask> pool = GetSampleTasks(GetSampleTaskLists(), "The Pool");
-			Assert.IsTrue(pool.Where(task => String.Equals(task.Title, "SampleChore1")).Any());
+			Assert.IsTrue(pool.Where(TaskIsNamed("SampleChore1")).Any());
         }
 		[TestMethod]
-		public void MSGraphGetSampleDataTest3()
+		public void MSGraphGetSampleDataTest3_Deadline()
         {
-			TodoTask chore1 = GetSampleTasks(GetSampleTaskLists(), "The Pool")
-								.Where(task => String.Equals(task.Title, "SampleChore1"))
-								.FirstOrDefault();
+			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			Assert.IsNotNull(chore1);
 			DateTimeTimeZone expected = new DateTimeTimeZone
 			{
-				DateTime = "2022-03-12T23:00:00",
+				DateTime = DateTime.Parse("2022-03-12T23:00:00").ToString(),
 				TimeZone = "America/Chicago"
 			};
 			DateTimeTimeZone actual = chore1.Deadline();
-			Assert.IsTrue(DateTimeTimeZone.Equals(expected, actual), $"expected time {expected} but got {actual}");
+			Assert.IsTrue(DateTime.Equals(expected.DateTime, actual.DateTime), $"expected time {expected.DateTime.ToString()} but got {actual.DateTime.ToString()}");
+			Assert.IsTrue(TimeZone.Equals(expected.TimeZone, actual.TimeZone), $"expected timezone {expected.TimeZone.ToString()} but got {actual.TimeZone.ToString()}");
         }
+		[TestMethod]
+		public void MSGraphGetSampleDataTest4_CreateTime()
+        {
+			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
+			Assert.IsNotNull(chore1);
+			DateTimeOffset? actual = chore1.CreatedTime();
+			DateTimeOffset expected = DateTimeOffset.Parse("2022-03-05 12:00:00 -5:00");
+			if (actual is DateTimeOffset)
+				Assert.AreEqual(0, expected.CompareTo((DateTimeOffset)actual));
+			else
+				Assert.Fail($"Created time is type {actual.GetType().ToString()}");
+        }
+		[TestMethod]
+		public void MSGraphGetSampleDataTest5_Recurrance()
+        {
+			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
+			Assert.IsNotNull(chore1);
+			PatternedRecurrence actual = chore1.Recurrence();
+			Assert.AreEqual(RecurrencePatternType.Daily, actual.Pattern.Type);
+			Assert.AreEqual(1, actual.Pattern.Interval);
+		}
 
 		[TestMethod]
 		public void MSGraphAuthenticationTest()
