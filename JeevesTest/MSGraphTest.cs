@@ -20,26 +20,16 @@ namespace JeevesTest
 		public JObject GetSampleTaskLists() =>
 			JObject.Parse(System.IO.File.ReadAllText("sampleTasks.json"));
 
-		public IEnumerable<TodoTask> GetSampleTasks(JObject sampleTaskLists, string displayName)
-        {
-			IEnumerable<JToken> taskLists = sampleTaskLists["taskLists"].Children();
-			JToken filtered = taskLists.Where((list) => String.Equals(list["displayName"].ToObject<string>(), displayName)).FirstOrDefault();
-			IEnumerable<JToken> tasks = filtered["tasks"];
-			IEnumerable<TodoTask> ret = tasks.Select(task => task.ToObject<TodoTask>(new JsonSerializer
-			{
-				TypeNameHandling = TypeNameHandling.Auto
-			}));
-			// maybe need to recursively deserialize the internal json members
-			return ret;
-        }
-			//=>
-			//sampleTaskLists["taskLists"]
-			//	.Where(list => list["displayName"].Equals(displayName))
-			//	.FirstOrDefault()["tasks"]
-			//	.Select(task => task.ToObject<TodoTask>());
+		public IEnumerable<TodoTask> GetSampleTasks(JObject sampleTaskLists, string displayName) =>
+			sampleTaskLists["taskLists"].Children()
+				.Where(list => String.Equals(list["displayName"].ToObject<string>(), displayName))
+				.FirstOrDefault()["tasks"]
+				.Select(task => task.ToObject<TodoTask>(new JsonSerializer
+				{
+					TypeNameHandling = TypeNameHandling.Auto
+				}));
 
-		
-		public void InitGraphWithSampleData()
+        public void InitGraphWithSampleData()
 		{
 
 
@@ -67,7 +57,13 @@ namespace JeevesTest
 						AdditionalData = new Dictionary<string, object>()
 						{
 							{"extensionProperty1", "property1value" },
-							{"extensionProperty2", "property2value" }
+							{"extensionProperty2", "property2value" },
+							{"extensionDateTimeTimeZone", new DateTimeTimeZone
+								{
+									DateTime = "2022-03-12T23:00:00",
+									TimeZone = "America/Chicago"
+								}
+                            }
 						}
 					}
 
@@ -81,12 +77,26 @@ namespace JeevesTest
         }
 
 		[TestMethod]
-		public void MSGraphGetSampleDataTest()
+		public void MSGraphGetSampleDataTest2()
         {
 			IEnumerable<TodoTask> pool = GetSampleTasks(GetSampleTaskLists(), "The Pool");
 			Assert.IsTrue(pool.Where(task => String.Equals(task.Title, "SampleChore1")).Any());
         }
-
+		[TestMethod]
+		public void MSGraphGetSampleDataTest3()
+        {
+			TodoTask chore1 = GetSampleTasks(GetSampleTaskLists(), "The Pool")
+								.Where(task => String.Equals(task.Title, "SampleChore1"))
+								.FirstOrDefault();
+			Assert.IsNotNull(chore1);
+			DateTimeTimeZone expected = new DateTimeTimeZone
+			{
+				DateTime = "2022-03-12T23:00:00",
+				TimeZone = "America/Chicago"
+			};
+			DateTimeTimeZone actual = chore1.Deadline();
+			Assert.IsTrue(DateTimeTimeZone.Equals(expected, actual), $"expected time {expected} but got {actual}");
+        }
 
 		[TestMethod]
 		public void MSGraphAuthenticationTest()

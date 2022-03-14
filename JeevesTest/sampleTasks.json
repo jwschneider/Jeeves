@@ -14,11 +14,21 @@
             "$values": [
               {
                 "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
-                "extensionName": "testExtension",
+                "extensionName": "taskProperties",
                 "additionalData": {
                   "category": "Housework",
-                  "releaseDate": "2022-03-12T13:00:00Z",
-                  "processTime": "1:00:00"
+                  "location": "3955 Dogwood Ln. Lauderdale MS 39335",
+                  "releaseDate": {
+                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
+                    "dateTime": "2022-03-12T07:00:00",
+                    "timeZone": "America/Chicago"
+                  },
+                  "processTime": "1:00:00",
+                  "deadline": {
+                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
+                    "DateTime": "2022-03-12T23:00:00",
+                    "TimeZone": "America/Chicago"
+                  }
                 }
               }
             ]
@@ -38,7 +48,28 @@
                 "extensionName": "testExtension",
                 "additionalData": {
                   "category": "Housework",
-                  "releaseDate": "2022-03-12T13:00:00Z",
+                  "releaseDate": "2022-03-12T12:00:00Z",
+                  "processTime": "2:00:00"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "title": "SampleErrand1",
+          "dueDateTime": {
+            "dateTime": "2022-03-15T23:00:00",
+            "timeZone": "America/Chicago"
+          },
+          "extensions": {
+            "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
+            "$values": [
+              {
+                "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
+                "extensionName": "testExtension",
+                "additionalData": {
+                  "category": "Housework",
+                  "releaseDate": "2022-03-12T12:00:00Z",
                   "processTime": "2:00:00"
                 }
               }
