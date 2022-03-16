@@ -16,6 +16,8 @@ namespace Jeeves
 			graph = new MSGraphInstance(scope);
 		}
 
+
+
 		public async Task<bool> DetectChangesAsync() =>
 			await graph.DetectChangesAsync();
 		public async Task<IEnumerable<Job>> PullIncompleteJobsFromCloudAsync() =>

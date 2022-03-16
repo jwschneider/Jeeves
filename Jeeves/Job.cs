@@ -5,14 +5,19 @@ namespace Jeeves
 {
     public class Job
     {
-        public int Identity { get; set; }
+        public string Identity { get; set; }
         public int Value { get; set; }
         public int ReleaseTime { get; set; }
         public int ProcessTime { get; set; }
         public int DueDate { get; set; }
         public int Deadline { get; set; }
 
-        public Job(int identity, int value, int releaseTime, int processTime, int dueDate, int deadline)
+        public Job()
+        {
+
+        }
+
+        public Job(string identity, int value, int releaseTime, int processTime, int dueDate, int deadline)
         {
             Identity = identity;
             Value = value;
@@ -27,7 +32,7 @@ namespace Jeeves
             {
                 throw new ArgumentException($"Rows of input array are of incorrect length: {array.GetLength}");
             }
-            return new Job(array[0], array[1], array[2], array[3], array[4], array[5]);
+            return new Job(array[0].ToString(), array[1], array[2], array[3], array[4], array[5]);
 
         }
         // Array format for job is 6 columns: identity, value, releaseTime, processTime, dueDate, deadline
@@ -40,7 +45,7 @@ namespace Jeeves
             List<Job> jobs = new List<Job>();
             for (int i = 0; i < matrix.GetLength(0); i++)
             {
-                jobs.Add(new Job(matrix[i, 0], matrix[i, 1], matrix[i, 2], matrix[i, 3], matrix[i, 4], matrix[i, 5]));
+                jobs.Add(new Job(matrix[i, 0].ToString(), matrix[i, 1], matrix[i, 2], matrix[i, 3], matrix[i, 4], matrix[i, 5]));
             }
             return jobs;
         }

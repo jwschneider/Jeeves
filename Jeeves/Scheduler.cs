@@ -69,7 +69,7 @@ namespace Jeeves
                         {
                             var tk = Math.Max(ti + i.ProcessTime + setup(i, k), k.ReleaseTime);
                             var Xk = X.Append(k).Where(j => j.Deadline - j.ProcessTime >= tk + k.ProcessTime + setup(k, j));
-                            var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);  // implement weighted tardiness
+                            var Tk = Math.Max(tk + k.ProcessTime - k.DueDate, 0);  // todo implement weighted tardiness
                             return new ScheduleState(k, Xk, tk, s.Value + k.Value, s);
                         }
                     );
