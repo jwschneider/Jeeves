@@ -8,6 +8,7 @@ namespace Jeeves
 	public static class TodoTaskExtensions
 	{
 		// all extensions assume task is not null
+		// todo change these to return UTC
 		public static string Identity(this TodoTask task) =>
 			task.Id;
 		public static string Title(this TodoTask task) =>
@@ -16,35 +17,35 @@ namespace Jeeves
 			(string)task.extensionProperty("category");
 		public static string Location(this TodoTask task) =>
 			(string)task.extensionProperty("location");
-		public static DateTimeTimeZone ReleaseDate(this TodoTask task) =>
-			(DateTimeTimeZone)task.extensionProperty("releaseDate");
+		public static DateTime ReleaseDate(this TodoTask task) =>
+			((DateTimeTimeZone)task.extensionProperty("releaseDate")).ToUTC();
 		public static TimeSpan ProcessTime(this TodoTask task) =>
 			(TimeSpan)task.extensionProperty("processTime");
-		public static DateTimeTimeZone DueDate(this TodoTask task) =>
-			task.DueDateTime;
-		public static DateTimeTimeZone Deadline(this TodoTask task) =>
-			(DateTimeTimeZone)task.extensionProperty("deadline");
-		public static DateTimeOffset? CreatedTime(this TodoTask task) =>
-			task.CreatedDateTime;
-		public static DateTimeTimeZone CompletedTime(this TodoTask task) =>
-			task.CompletedDateTime;
+		public static DateTime DueDate(this TodoTask task) =>
+			task.DueDateTime.ToUTC();
+		public static DateTime Deadline(this TodoTask task) =>
+			((DateTimeTimeZone)task.extensionProperty("deadline")).ToUTC();
+		public static DateTime CreatedTime(this TodoTask task) =>
+			task.CreatedDateTime.HasValue ?
+				((DateTimeOffset)task.CreatedDateTime).ToUniversalTime().DateTime :
+				DateTime.MinValue;
+		public static DateTime CompletedTime(this TodoTask task) =>
+			task.CompletedDateTime.ToUTC();
 		public static PatternedRecurrence Recurrence(this TodoTask task) =>
 			task.Recurrence;
-
+		public static bool IsDaily(this TodoTask task) =>
+			task.Recurrence() != null;
 
 		// Assumes task has already been checked for good format and no null fields
-		public static Job ToScheduleJob(this TodoTask task, RealDateTimeConverter toScheduleTime, RealTimeSpanConverter toScheduleDuration) =>
+		public static Job ToScheduleJob(this TodoTask task, UserPreferences preferences) =>
 			new Job
 			{
 				Identity = task.Identity(),
-				ReleaseTime = toScheduleTime(task.ReleaseDate().ToUTC()),
-				ProcessTime = toScheduleDuration(task.ProcessTime()),
-				DueDate = toScheduleTime(task.DueDate().ToUTC()),
-				Deadline = toScheduleTime(task.Deadline().ToUTC()),
-				Value = task.Category() switch
-                {
-					_ => 1  // todo value based on category
-                }
+				ReleaseTime = preferences.ToScheduleTime(task.ReleaseDate()),
+				ProcessTime = preferences.ToScheduleDuration(task.ProcessTime()),
+				DueDate = preferences.ToScheduleTime(task.DueDate()),
+				Deadline = preferences.ToScheduleTime(task.Deadline()),
+				Value = preferences.ValueByCategory(task.Category(), task.IsDaily(), task.CreatedTime(), task.CompletedTime())
 			};
 		private static void CheckForNullJobField(this TodoTask task)
 		{
