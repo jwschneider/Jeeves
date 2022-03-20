@@ -17,10 +17,8 @@ namespace Jeeves
 				(timeSinceWorkdayStart(time)
 					+ maxOneDayDuration(time - DateTime.Today) * workdayLength())
 				/ SchedulingFidelity);
-		public DateTime FromScheduleTime(int time)
-        {
-			throw new NotImplementedException();
-        }
+		public DateTime FromScheduleTime(int time) =>
+			DateTime.Today + scheduleTimeDaysOnly(time) + scheduleTimeTimeOnly(time);
 		public int ToScheduleDuration(TimeSpan duration) =>
 			(int)Math.Round(
 				(maxOneDayDuration(duration) * workdayLength() + timeOnlyDuration(duration))
@@ -41,6 +39,12 @@ namespace Jeeves
 			TimeZoneInfo.ConvertTimeToUtc(WorkdayEnd, TimeZone);
 		private TimeSpan workdayLength() =>
 			workdayEndUTC() - workdayStartUTC();
+		private int scheduleWorkdayLength() =>
+			(int)Math.Round(workdayLength() / SchedulingFidelity);
+		private TimeSpan scheduleTimeDaysOnly(int time) =>
+			new TimeSpan(time / scheduleWorkdayLength(), 0, 0, 0);
+		private TimeSpan scheduleTimeTimeOnly(int time) =>
+			(time % scheduleWorkdayLength()) * SchedulingFidelity;
 		private int maxOneDayDuration(TimeSpan duration) =>
 			Math.Min(1, duration.Days);
 		private TimeSpan timeSinceWorkdayStart(DateTime time) =>
