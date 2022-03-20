@@ -8,7 +8,6 @@ namespace Jeeves
 	public static class TodoTaskExtensions
 	{
 		// all extensions assume task is not null
-		// todo change these to return UTC
 		public static string Identity(this TodoTask task) =>
 			task.Id;
 		public static string Title(this TodoTask task) =>
@@ -53,15 +52,15 @@ namespace Jeeves
 				throw new ArgumentNullException("'Category'");
 			if (task.Location() is null)
 				throw new ArgumentNullException("'Location'");
-			if (task.ReleaseDate() is null)
+			if (DateTime.Equals(task.ReleaseDate(), DateTime.MinValue))
 				throw new ArgumentNullException("'Release date'");
 			if (task.ProcessTime().Equals(TimeSpan.Zero))
 				throw new ArgumentNullException("'Process time'");
-			if (task.DueDate() is null)
+			if (DateTime.Equals(task.DueDate(), DateTime.MinValue))
 				throw new ArgumentNullException("'Due date'");
-			if (task.Deadline() is null)
+			if (DateTime.Equals(task.Deadline(), DateTime.MinValue))
 				throw new ArgumentNullException("'Deadline'");
-			if (task.CreatedTime() is null)
+			if (DateTime.Equals(task.CreatedTime(), DateTime.MinValue))
 				throw new ArgumentNullException("'Created time'");
 		}
 
