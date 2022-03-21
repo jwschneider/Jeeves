@@ -45,7 +45,7 @@ namespace JeevesTest
 		[TestMethod]
 		public void MSGraphGetSampleDataTest0_JsonToTask()
         {
-			string json = System.IO.File.ReadAllText("testSampleTask.json");
+			string json = System.IO.File.ReadAllText("sampleTaskTest.json");
 			TodoTask task = JsonConvert.DeserializeObject<TodoTask>(json, new JsonSerializerSettings
 			{
 				TypeNameHandling = TypeNameHandling.Auto
@@ -68,7 +68,7 @@ namespace JeevesTest
 							{"extensionProperty2", "property2value" },
 							{"extensionDateTimeTimeZone", new DateTimeTimeZone
 								{
-									DateTime = "2022-03-12T23:00:00",
+									DateTime = "2022-03-10T23:00:00",
 									TimeZone = "America/Chicago"
 								}
                             }
@@ -95,26 +95,24 @@ namespace JeevesTest
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			Assert.IsNotNull(chore1);
-			DateTimeTimeZone expected = new DateTimeTimeZone
-			{
-				DateTime = DateTime.Parse("2022-03-12T23:00:00").ToString(),
-				TimeZone = "America/Chicago"
-			};
-			DateTimeTimeZone actual = chore1.Deadline();
-			Assert.IsTrue(DateTime.Equals(expected.DateTime, actual.DateTime), $"expected time {expected.DateTime.ToString()} but got {actual.DateTime.ToString()}");
-			Assert.IsTrue(TimeZone.Equals(expected.TimeZone, actual.TimeZone), $"expected timezone {expected.TimeZone.ToString()} but got {actual.TimeZone.ToString()}");
+			//DateTimeTimeZone expected = new DateTimeTimeZone
+			//{
+			//	DateTime = DateTime.Parse("2022-03-12T23:00:00").ToString(),
+			//	TimeZone = "America/Chicago"
+			//};
+			DateTime expected = new DateTime(2022, 03, 11, 5, 0, 0);
+			DateTime actual = chore1.Deadline();
+			Assert.IsTrue(DateTime.Equals(expected, actual), $"expected time {expected} but got {actual}");
         }
 		[TestMethod]
 		public void MSGraphGetSampleDataTest4_CreateTime()
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			Assert.IsNotNull(chore1);
-			DateTimeOffset? actual = chore1.CreatedTime();
-			DateTimeOffset expected = DateTimeOffset.Parse("2022-03-05 12:00:00 -5:00");
-			if (actual is DateTimeOffset)
-				Assert.AreEqual(0, expected.CompareTo((DateTimeOffset)actual));
-			else
-				Assert.Fail($"Created time is type {actual.GetType().ToString()}");
+			DateTime actual = chore1.CreatedTime();
+			//DateTimeOffset expected = DateTimeOffset.Parse("2022-03-05 12:00:00 -5:00");
+			DateTime expected = new DateTime(2022, 3, 3, 18, 0, 0);
+			Assert.AreEqual(0, expected.CompareTo(actual));
         }
 		[TestMethod]
 		public void MSGraphGetSampleDataTest5_Recurrance()

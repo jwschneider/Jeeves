@@ -5,9 +5,9 @@
       "tasks": [
         {
           "title": "SampleChore1",
-          "createdDateTime": "2022-03-05 12:00:00 -5:00",
+          "createdDateTime": "2022-03-03 12:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-12T23:00:00",
+            "dateTime": "2022-03-10T23:00:00",
             "timeZone": "America/Chicago"
           },
           "extensions": {
@@ -21,13 +21,13 @@
                   "location": "3955 Dogwood Ln. Lauderdale MS 39335",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T07:00:00",
+                    "dateTime": "2022-03-10T07:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "1:00:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-12T23:00:00",
+                    "DateTime": "2022-03-10T23:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -37,9 +37,9 @@
         },
         {
           "title": "SampleChore2",
-          "createdDateTime": "2022-03-10 12:00:00 -5:00",
+          "createdDateTime": "2022-03-08 12:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-15T23:00:00",
+            "dateTime": "2022-03-13T23:00:00",
             "timeZone": "America/Chicago"
           },
           "extensions": {
@@ -53,13 +53,13 @@
                   "location": "3955 Dogwood Ln. Lauderdale MS 39335",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T07:00:00",
+                    "dateTime": "2022-03-10T07:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "2:00:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-15T23:00:00",
+                    "DateTime": "2022-03-13T23:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -69,9 +69,9 @@
         },
         {
           "title": "SampleErrand1",
-          "createdDateTime": "2022-03-11 12:00:00 -5:00",
+          "createdDateTime": "2022-03-09 12:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-13T20:00:00",
+            "dateTime": "2022-03-11T20:00:00",
             "timeZone": "America/Chicago"
           },
           "extensions": {
@@ -85,13 +85,13 @@
                   "location": "100 15th Pl S, Meridian, MS 39301",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T07:00:00",
+                    "dateTime": "2022-03-10T07:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "0:30:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-13T20:00:00",
+                    "DateTime": "2022-03-11T20:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -101,9 +101,9 @@
         },
         {
           "title": "SampleErrand2",
-          "createdDateTime": "2022-03-11 12:00:00 -5:00",
+          "createdDateTime": "2022-03-09 12:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-13T18:00:00",
+            "dateTime": "2022-03-11T18:00:00",
             "timeZone": "America/Chicago"
           },
           "extensions": {
@@ -117,13 +117,13 @@
                   "location": "1733 2nd St S, Meridian, MS 39301",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T07:00:00",
+                    "dateTime": "2022-03-10T07:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "0:30:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-13T18:00:00",
+                    "DateTime": "2022-03-11T18:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -133,9 +133,9 @@
         },
         {
           "title": "SampleErrand2",
-          "createdDateTime": "2022-03-11 12:00:00 -5:00",
+          "createdDateTime": "2022-03-09 12:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-13T18:00:00",
+            "dateTime": "2022-03-11T18:00:00",
             "timeZone": "America/Chicago"
           },
           "extensions": {
@@ -149,13 +149,13 @@
                   "location": "1733 2nd St S, Meridian, MS 39301",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T07:00:00",
+                    "dateTime": "2022-03-10T07:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "0:30:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-13T18:00:00",
+                    "DateTime": "2022-03-11T18:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -165,9 +165,9 @@
         },
         {
           "title": "SampleFlight",
-          "createdDateTime": "2022-03-11 18:00:00 -5:00",
+          "createdDateTime": "2022-03-09 18:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-13T13:30:00",
+            "dateTime": "2022-03-11T13:30:00",
             "timeZone": "America/Chicago"
           },
           "extensions": {
@@ -181,13 +181,13 @@
                   "location": "255 Rosenbaum Ave, Meridian, MS 39309",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T10:00:00",
+                    "dateTime": "2022-03-10T10:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "2:30:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-13T13:30:00",
+                    "DateTime": "2022-03-11T13:30:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -214,9 +214,9 @@
       "tasks": [
         {
           "title": "SampleDaily1",
-          "createdDateTime": "2022-03-12 00:00:00 -5:00",
+          "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-12T12:00:00",
+            "dateTime": "2022-03-10T12:00:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
@@ -236,13 +236,13 @@
                   "location": "3955 Dogwood Ln. Lauderdale MS 39335",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T07:00:00",
+                    "dateTime": "2022-03-10T07:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "1:00:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-12T23:00:00",
+                    "DateTime": "2022-03-10T23:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -252,9 +252,9 @@
         },
         {
           "title": "SampleLunch",
-          "createdDateTime": "2022-03-12 00:00:00 -5:00",
+          "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-12T13:00:00",
+            "dateTime": "2022-03-10T13:00:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
@@ -274,13 +274,13 @@
                   "location": "3955 Dogwood Ln. Lauderdale MS 39335",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T11:30:00",
+                    "dateTime": "2022-03-10T11:30:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "0:45:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-12T16:00:00",
+                    "DateTime": "2022-03-10T16:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -290,9 +290,9 @@
         },
         {
           "title": "SampleDinner",
-          "createdDateTime": "2022-03-12 00:00:00 -5:00",
+          "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-12T20:00:00",
+            "dateTime": "2022-03-10T20:00:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
@@ -312,13 +312,13 @@
                   "location": "3955 Dogwood Ln. Lauderdale MS 39335",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T18:00:00",
+                    "dateTime": "2022-03-10T18:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "1:00:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-12T23:00:00",
+                    "DateTime": "2022-03-10T23:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -328,9 +328,9 @@
         },
         {
           "title": "SampleExercise",
-          "createdDateTime": "2022-03-12 00:00:00 -5:00",
+          "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-12T18:00:00",
+            "dateTime": "2022-03-10T18:00:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
@@ -350,13 +350,13 @@
                   "location": "3955 Dogwood Ln. Lauderdale MS 39335",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T07:00:00",
+                    "dateTime": "2022-03-10T07:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "1:30:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-12T18:00:00",
+                    "DateTime": "2022-03-10T18:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }
@@ -366,9 +366,9 @@
         },
         {
           "title": "SampleExecutiveTime",
-          "createdDateTime": "2022-03-12 00:00:00 -5:00",
+          "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
-            "dateTime": "2022-03-12T23:00:00",
+            "dateTime": "2022-03-10T23:00:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
@@ -388,13 +388,13 @@
                   "location": "3955 Dogwood Ln. Lauderdale MS 39335",
                   "releaseDate": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-12T17:00:00",
+                    "dateTime": "2022-03-10T17:00:00",
                     "timeZone": "America/Chicago"
                   },
                   "processTime": "2:00:00",
                   "deadline": {
                     "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-12T23:00:00",
+                    "DateTime": "2022-03-10T23:00:00",
                     "TimeZone": "America/Chicago"
                   }
                 }

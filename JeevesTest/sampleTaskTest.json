@@ -1,7 +1,7 @@
 ﻿{
   "title": "TestSampleTask",
   "dueDateTime": {
-    "dateTime": "2022-03-12T23:00:00",
+    "dateTime": "2022-03-10T23:00:00",
     "timeZone": "America/Chicago"
   },
   "extensions": {

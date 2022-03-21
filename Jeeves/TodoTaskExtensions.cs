@@ -8,6 +8,7 @@ namespace Jeeves
 	public static class TodoTaskExtensions
 	{
 		// all extensions assume task is not null
+		// all extensions return UTC
 		public static string Identity(this TodoTask task) =>
 			task.Id;
 		public static string Title(this TodoTask task) =>

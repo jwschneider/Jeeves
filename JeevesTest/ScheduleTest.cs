@@ -28,7 +28,7 @@ namespace JeevesTest
                 {1, 1, 1, 1, 1},
                 {1, 2, 1, 2, 1}
             };
-            SetupTime setupTime = (Job i, Job j) => setupMatrix[i == null ? 0 : i.Identity, j.Identity];
+            SetupTime setupTime = (Job i, Job j) => setupMatrix[i == null ? 0 : int.Parse(i.Identity), int.Parse(j.Identity)];
             List<(Job, int)> scheduledJobs = Scheduler.Schedule(jobs, setupTime).ToList<(Job, int)>();
 
             List<(Job, int)> solution = new List<(Job, int)>(new (Job, int)[]
