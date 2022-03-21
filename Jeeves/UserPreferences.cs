@@ -4,7 +4,7 @@ namespace Jeeves
 {
 	public class UserPreferences
 	{
-		public TimeZoneInfo TimeZone { get; set; }
+		public string TimeZone { get; set; }
 		public DateTime WorkdayStart { get; set; }
 		public DateTime WorkdayEnd { get; set; }
 		public TimeSpan SchedulingFidelity { get; set; }
@@ -18,7 +18,7 @@ namespace Jeeves
 					+ maxOneDayDuration(time - DateTime.Today) * workdayLength())
 				/ SchedulingFidelity);
 		public DateTime FromScheduleTime(int time) =>
-			DateTime.Today + scheduleTimeDaysOnly(time) + scheduleTimeTimeOnly(time);
+			DateTime.Today + scheduleTimeDaysOnly(time) + scheduleTimeTimeOnly(time) + workdayStartUTC().TimeOfDay;
 		public int ToScheduleDuration(TimeSpan duration) =>
 			(int)Math.Round(
 				(maxOneDayDuration(duration) * workdayLength() + timeOnlyDuration(duration))
@@ -32,11 +32,12 @@ namespace Jeeves
 					"Sim / Flight" => 100,
 					_ => 1 + (DateTime.Now - created).Days
 				};
-
+		public TimeZoneInfo GetTimeZone() =>
+			TimeZoneInfo.FindSystemTimeZoneById(TimeZone);
 		private DateTime workdayStartUTC() =>
-			TimeZoneInfo.ConvertTimeToUtc(WorkdayStart, TimeZone);
+			TimeZoneInfo.ConvertTimeToUtc(WorkdayStart, GetTimeZone());
 		private DateTime workdayEndUTC() =>
-			TimeZoneInfo.ConvertTimeToUtc(WorkdayEnd, TimeZone);
+			TimeZoneInfo.ConvertTimeToUtc(WorkdayEnd, GetTimeZone());
 		private TimeSpan workdayLength() =>
 			workdayEndUTC() - workdayStartUTC();
 		private int scheduleWorkdayLength() =>
