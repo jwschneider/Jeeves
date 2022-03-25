@@ -26,7 +26,7 @@ namespace Jeeves
 
 		public int ToScheduleTime(DateTime time) =>
 			(int)Math.Round(
-				(modTimeSpan(timeSinceWorkdayStart(time), day())
+				(clampTimeSpan(modTimeSpan(timeSinceWorkdayStart(time), day()), TimeSpan.Zero, workdayLength())
 					+ maxOneDayDuration(timeSinceWorkdayStart(time)) * workdayLength())
 				/ SchedulingFidelity);
 		public DateTime FromScheduleTime(int time) =>
@@ -46,28 +46,46 @@ namespace Jeeves
 				};
 		public TimeZoneInfo GetTimeZone() =>
 			TimeZoneInfo.FindSystemTimeZoneById(TimeZone);
+
 		private DateTime workdayStartUTC() =>
 			TimeZoneInfo.ConvertTimeToUtc(WorkdayStart, GetTimeZone());
+
 		private DateTime workdayEndUTC() =>
 			TimeZoneInfo.ConvertTimeToUtc(WorkdayEnd, GetTimeZone());
+
 		private TimeSpan workdayLength() =>
 			workdayEndUTC() - workdayStartUTC();
+
 		private int scheduleWorkdayLength() =>
 			(int)Math.Round(workdayLength() / SchedulingFidelity);
+
 		private TimeSpan scheduleTimeDaysOnly(int time) =>
 			new TimeSpan(time / scheduleWorkdayLength(), 0, 0, 0);
+
 		private TimeSpan scheduleTimeTimeOnly(int time) =>
 			(time % scheduleWorkdayLength()) * SchedulingFidelity;
+
 		private int maxOneDayDuration(TimeSpan duration) =>
 			Math.Min(1, duration.Days);
+
 		private TimeSpan timeSinceWorkdayStart(DateTime time) =>
 			time - workdayStartUTC();
+
 		private TimeSpan timeOnlyDuration(TimeSpan duration) =>
 			new TimeSpan(duration.Hours, duration.Minutes, duration.Seconds);
+
 		private TimeSpan day() =>
 			new TimeSpan(24, 0, 0);
+
 		private TimeSpan modTimeSpan(TimeSpan a, TimeSpan b) =>
 			new TimeSpan(a.Ticks % b.Ticks);
+
+		private TimeSpan clampTimeSpan(TimeSpan a, TimeSpan minValue, TimeSpan maxValue) =>
+			new TimeSpan(Math.Clamp(a.Ticks, minValue.Ticks, maxValue.Ticks));
 	}
+	public static class TimeExtensions
+    {
+		//todo
+    }
 }
 

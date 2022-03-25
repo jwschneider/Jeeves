@@ -122,8 +122,8 @@ namespace JeevesTest
 		{
 			DateTime time = DateTime.Today +
 				(DateTime.Today.IsDaylightSavingTime() ?
-					TimeSpan.Parse("1.12:00:00") :
-					TimeSpan.Parse("1.13:00:00"));
+					TimeSpan.Parse("1.11:00:00") :
+					TimeSpan.Parse("1.12:00:00"));
 			int expected = 64;
 			int actual = preferences.ToScheduleTime(time);
 			Assert.AreEqual(expected, actual);
