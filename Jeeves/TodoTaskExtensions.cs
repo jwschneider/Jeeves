@@ -20,7 +20,7 @@ namespace Jeeves
 		public static DateTime ReleaseDate(this TodoTask task) =>
 			((DateTimeTimeZone)task.extensionProperty("releaseDate")).ToUTC();
 		public static TimeSpan ProcessTime(this TodoTask task) =>
-			(TimeSpan)task.extensionProperty("processTime");
+			TimeSpan.Parse((string)task.extensionProperty("processTime"));
 		public static DateTime DueDate(this TodoTask task) =>
 			task.DueDateTime.ToUTC();
 		public static DateTime Deadline(this TodoTask task) =>
@@ -29,8 +29,9 @@ namespace Jeeves
 			task.CreatedDateTime.HasValue ?
 				((DateTimeOffset)task.CreatedDateTime).ToUniversalTime().DateTime :
 				DateTime.MinValue;
-		public static DateTime CompletedTime(this TodoTask task) =>
-			task.CompletedDateTime.ToUTC();
+		public static DateTime? CompletedTime(this TodoTask task) =>
+			task.CompletedDateTime is null ? null :
+				task.CompletedDateTime.ToUTC();
 		public static PatternedRecurrence Recurrence(this TodoTask task) =>
 			task.Recurrence;
 		public static bool IsDaily(this TodoTask task) =>

@@ -15,8 +15,7 @@ namespace JeevesTest
 		[ClassInitialize]
 		public static void InitUserPrefs(TestContext context)
         {
-			string json = System.IO.File.ReadAllText("sampleUserPreferences.json");
-			preferences = JsonConvert.DeserializeObject<UserPreferences>(json);
+			preferences = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
         }
 		[TestMethod]
 		public void ScheduleTimeToRealTimeTest0()

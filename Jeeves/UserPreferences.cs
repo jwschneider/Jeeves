@@ -1,9 +1,17 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Jeeves
 {
 	public class UserPreferences
 	{
+		public static UserPreferences UserPrefsFromFile(string filename)
+		{
+			string json = System.IO.File.ReadAllText(filename);
+			return JsonConvert.DeserializeObject<UserPreferences>(json);
+		}
+
+
 		public string TimeZone { get; set; }
 		public DateTime WorkdayStart
 		{
@@ -26,7 +34,7 @@ namespace Jeeves
 
 		public int ToScheduleTime(DateTime time) =>
 			(int)Math.Round(
-				(clampTimeSpan(modTimeSpan(timeSinceWorkdayStart(time), day()), TimeSpan.Zero, workdayLength())
+				(timeSinceWorkdayStart(time).modTimeSpan(day()).clampTimeSpan(TimeSpan.Zero, workdayLength())
 					+ maxOneDayDuration(timeSinceWorkdayStart(time)) * workdayLength())
 				/ SchedulingFidelity);
 		public DateTime FromScheduleTime(int time) =>
@@ -36,9 +44,9 @@ namespace Jeeves
 				(maxOneDayDuration(duration) * workdayLength() + timeOnlyDuration(duration))
 				/ SchedulingFidelity
 				);
-		public int ValueByCategory(string category, bool isDaily, DateTime created, DateTime lastCompleted) =>
+		public int ValueByCategory(string category, bool isDaily, DateTime created, DateTime? lastCompleted) =>
 			isDaily ?
-				10 + (DateTime.Now - lastCompleted).Days :
+				10 + Math.Min((DateTime.Now - (lastCompleted.HasValue? (DateTime)lastCompleted : DateTime.MinValue)).Days, 10) :
 				category switch
 				{
 					"Sim / Flight" => 100,
@@ -77,15 +85,13 @@ namespace Jeeves
 		private TimeSpan day() =>
 			new TimeSpan(24, 0, 0);
 
-		private TimeSpan modTimeSpan(TimeSpan a, TimeSpan b) =>
-			new TimeSpan(a.Ticks % b.Ticks);
-
-		private TimeSpan clampTimeSpan(TimeSpan a, TimeSpan minValue, TimeSpan maxValue) =>
-			new TimeSpan(Math.Clamp(a.Ticks, minValue.Ticks, maxValue.Ticks));
 	}
 	public static class TimeExtensions
     {
-		//todo
-    }
+		public static TimeSpan modTimeSpan(this TimeSpan a, TimeSpan b) =>
+			new TimeSpan(a.Ticks % b.Ticks);
+		public static TimeSpan clampTimeSpan(this TimeSpan a, TimeSpan minValue, TimeSpan maxValue) =>
+			new TimeSpan(Math.Clamp(a.Ticks, minValue.Ticks, maxValue.Ticks));
+	}
 }
 

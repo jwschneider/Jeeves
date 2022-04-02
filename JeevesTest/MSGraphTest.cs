@@ -19,6 +19,8 @@ namespace JeevesTest
 	{
 		public JObject GetSampleTaskLists() =>
 			JObject.Parse(System.IO.File.ReadAllText("sampleTasks.json"));
+		public JObject GetSampleJobs() =>
+			JObject.Parse(System.IO.File.ReadAllText("sampleJobs.json"));
 
 		public IEnumerable<TodoTask> GetSampleTasks(JObject sampleTaskLists, string displayName) =>
 			sampleTaskLists["taskLists"].Children()
@@ -29,6 +31,7 @@ namespace JeevesTest
 					TypeNameHandling = TypeNameHandling.Auto
 				}));
 
+
         public void InitGraphWithSampleData()
 		{
 
@@ -36,12 +39,15 @@ namespace JeevesTest
 		}
 		public Func<TodoTask, bool> TaskIsNamed(string name) =>
 			(TodoTask task) => String.Equals(task.Title(), name);
+
 		public TodoTask GetTaskByName(string list, string name) =>
 			GetSampleTasks(GetSampleTaskLists(), list)
 				.Where(TaskIsNamed(name))
 				.FirstOrDefault();
 
-
+		public Job GetJobByIdentity(string identity) =>
+			null;
+				// todo
 		[TestMethod]
 		public void MSGraphGetSampleDataTest0_JsonToTask()
         {
@@ -132,6 +138,22 @@ namespace JeevesTest
 			string accessToken = provider.GetTokenAsync(scope).Result;
 			Assert.IsNotNull(accessToken);
 		}
+		[TestMethod]
+		public void TodoTaskToScheduleJobTest0()
+        {
+			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
+			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
+			Job chore1Job = chore1.ToScheduleJob(prefs);
+			string json = JsonConvert.SerializeObject(chore1Job);
+			Assert.IsNotNull(json);
+        }
+		[TestMethod]
+		public void GenerateSampleSchedule()
+		{
+			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
+
+		}
+
 	}
 }
 
