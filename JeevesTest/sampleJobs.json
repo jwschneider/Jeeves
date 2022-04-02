@@ -1,11 +1,13 @@
-﻿[
+﻿{
+  "jobs": [
     {
-      "Identity": 1,
-      "Value": 10,
-      "ReleaseTime": 0,
-      "ProcessTime": 4,
-      "DueDate": 20,
-      "Deadline": 64
+      "identity": 1,
+      "value": 10,
+      "releaseTime": 0,
+      "processTime": 4,
+      "dueDate": 20,
+      "deadline": 64
     }
-]
+  ]
+}
 

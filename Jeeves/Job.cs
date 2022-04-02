@@ -49,5 +49,22 @@ namespace Jeeves
             }
             return jobs;
         }
+        public override bool Equals(object obj)
+        {
+            if (obj is Job)
+            {
+                return String.Equals(((Job)obj).Identity, Identity)
+                    && DateTime.Equals(((Job)obj).ReleaseTime, ReleaseTime)
+                    && TimeSpan.Equals(((Job)obj).ProcessTime, ProcessTime)
+                    && DateTime.Equals(((Job)obj).DueDate, DueDate)
+                    && DateTime.Equals(((Job)obj).Deadline, Deadline)
+                    && ((Job)obj).Value == Value;
+            }
+            else return false;
+        }
+        public override string ToString()
+        {
+            return $"{{Identity:{Identity}, ReleaseTime{ReleaseTime}, ProcessTime{ProcessTime}, DueDate{DueDate}, Deadline{Deadline}, Value{Value}}}";
+        }
     }
 }

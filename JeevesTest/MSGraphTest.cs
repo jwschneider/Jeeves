@@ -32,7 +32,7 @@ namespace JeevesTest
 				}));
 
 
-        public void InitGraphWithSampleData()
+		public void InitGraphWithSampleData()
 		{
 
 
@@ -46,21 +46,25 @@ namespace JeevesTest
 				.FirstOrDefault();
 
 		public Job GetJobByIdentity(string identity) =>
-			null;
-				// todo
+			GetSampleJobs()["jobs"]
+				.Children()
+				.Where(job => String.Equals(job["identity"].ToObject<string>(), identity))
+				.Select(job => job.ToObject<Job>())
+				.FirstOrDefault();
+
 		[TestMethod]
 		public void MSGraphGetSampleDataTest0_JsonToTask()
-        {
+		{
 			string json = System.IO.File.ReadAllText("sampleTaskTest.json");
 			TodoTask task = JsonConvert.DeserializeObject<TodoTask>(json, new JsonSerializerSettings
 			{
 				TypeNameHandling = TypeNameHandling.Auto
 			});
 			Assert.IsNotNull(task);
-        }
+		}
 		[TestMethod]
 		public void MSGraphGetSampleDataTest1_TaskToJson()
-        {
+		{
 			TodoTask task = new TodoTask
 			{
 				Extensions = new TodoTaskExtensionsCollectionPage()
@@ -77,7 +81,7 @@ namespace JeevesTest
 									DateTime = "2022-03-10T23:00:00",
 									TimeZone = "America/Chicago"
 								}
-                            }
+							}
 						}
 					}
 
@@ -88,17 +92,17 @@ namespace JeevesTest
 				TypeNameHandling = TypeNameHandling.Auto
 			});
 			Assert.IsNotNull(json);
-        }
+		}
 
 		[TestMethod]
 		public void MSGraphGetSampleDataTest2_TaskFromJson()
-        {
+		{
 			IEnumerable<TodoTask> pool = GetSampleTasks(GetSampleTaskLists(), "The Pool");
 			Assert.IsTrue(pool.Where(TaskIsNamed("SampleChore1")).Any());
-        }
+		}
 		[TestMethod]
 		public void MSGraphGetSampleDataTest3_Deadline()
-        {
+		{
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			Assert.IsNotNull(chore1);
 			//DateTimeTimeZone expected = new DateTimeTimeZone
@@ -109,20 +113,20 @@ namespace JeevesTest
 			DateTime expected = new DateTime(2022, 03, 11, 5, 0, 0);
 			DateTime actual = chore1.Deadline();
 			Assert.IsTrue(DateTime.Equals(expected, actual), $"expected time {expected} but got {actual}");
-        }
+		}
 		[TestMethod]
 		public void MSGraphGetSampleDataTest4_CreateTime()
-        {
+		{
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			Assert.IsNotNull(chore1);
 			DateTime actual = chore1.CreatedTime();
 			//DateTimeOffset expected = DateTimeOffset.Parse("2022-03-05 12:00:00 -5:00");
 			DateTime expected = new DateTime(2022, 3, 3, 18, 0, 0);
 			Assert.AreEqual(0, expected.CompareTo(actual));
-        }
+		}
 		[TestMethod]
 		public void MSGraphGetSampleDataTest5_Recurrance()
-        {
+		{
 			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
 			Assert.IsNotNull(chore1);
 			PatternedRecurrence actual = chore1.Recurrence();
@@ -140,13 +144,24 @@ namespace JeevesTest
 		}
 		[TestMethod]
 		public void TodoTaskToScheduleJobTest0()
-        {
+		{
 			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
 			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
 			Job chore1Job = chore1.ToScheduleJob(prefs);
 			string json = JsonConvert.SerializeObject(chore1Job);
 			Assert.IsNotNull(json);
-        }
+		}
+		[TestMethod]
+		public void TodoTaskToScheduleJobTest1()
+		{
+			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
+			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
+			Job chore1actual = chore1.ToScheduleJob(prefs);
+			Job chore1expected = GetJobByIdentity("1");
+			Assert.IsNotNull(chore1expected);
+			Assert.AreEqual(chore1expected, chore1actual);
+		}
+
 		[TestMethod]
 		public void GenerateSampleSchedule()
 		{
