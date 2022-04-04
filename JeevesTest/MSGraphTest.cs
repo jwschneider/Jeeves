@@ -159,7 +159,10 @@ namespace JeevesTest
 			Job chore1actual = chore1.ToScheduleJob(prefs);
 			Job chore1expected = GetJobByIdentity("1");
 			Assert.IsNotNull(chore1expected);
-			Assert.AreEqual(chore1expected, chore1actual);
+			//Assert.AreEqual(chore1expected, chore1actual);
+			string message;
+			Assert.IsTrue(chore1actual.Equals(chore1expected, out message), message);
+			// todo use a different equals method that isolates the bad property for ease of debug
 		}
 
 		[TestMethod]

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace Jeeves
 {
@@ -61,6 +63,26 @@ namespace Jeeves
                     && ((Job)obj).Value == Value;
             }
             else return false;
+        }
+        public bool Equals(Job other, out string message)
+        {
+            string[] jobProperties = new string[] { "Identity", "ReleaseTime", "ProcessTime", "DueDate", "Deadline", "Value" };
+            var unequalProperty = jobProperties.Select<string, (bool, string)>(
+                property =>
+                    {
+                        var thisProp = this.GetType().GetProperty(property).GetValue(this);
+                        var otherProp = other.GetType().GetProperty(property).GetValue(other);
+                        return (!Equals(thisProp, otherProp), $"this {property}: {thisProp}, other {property}: {otherProp}");
+                    })
+                .Where(tuple => tuple.Item1)
+                .FirstOrDefault();
+            message = unequalProperty.Item2;
+            return !unequalProperty.Item1;
+        }
+        private bool AssignString(string input, out string output)
+        {
+            output = input;
+            return true;
         }
         public override string ToString()
         {
