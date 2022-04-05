@@ -2,11 +2,46 @@
 using Microsoft.Graph;
 using System.Globalization;
 using System.Linq;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Jeeves
 {
 	public static class TodoTaskExtensions
 	{
+		private static TodoTask Clone(this TodoTask task)
+		{
+			string json = JsonConvert.SerializeObject(task, new JsonSerializerSettings
+			{
+				TypeNameHandling = TypeNameHandling.Auto
+			});
+			return JsonConvert.DeserializeObject<TodoTask>(json, new JsonSerializerSettings
+			{
+				TypeNameHandling = TypeNameHandling.Auto
+			});
+		}
+		private static TodoTask SetExtensionProperty(this TodoTask task, string property, object value)
+		{
+			task.taskProperties().AdditionalData[property] = value;
+			return task;
+		}
+		// copies the task and changes the release date
+		public static TodoTask SetReleaseDate(this TodoTask task, DateTime releaseDate) =>
+			task.Clone().SetExtensionProperty("releaseDate", releaseDate.FromUTC());
+		public static TodoTask SetDueDate(this TodoTask task, DateTime dueDate)
+		{
+			TodoTask copy = task.Clone();
+			copy.DueDateTime = dueDate.FromUTC();
+			return copy;
+		}
+		public static TodoTask SetDeadline(this TodoTask task, DateTime deadline) =>
+			task.Clone().SetExtensionProperty("deadline", deadline.FromUTC());
+
+		public static TodoTask IncrementByInterval(this TodoTask task, TimeSpan interval) =>
+			task.SetReleaseDate(task.ReleaseDate() + interval)
+				.SetDueDate(task.DueDate() + interval)
+				.SetDeadline(task.Deadline() + interval);
+
 		// all extensions assume task is not null
 		// all extensions return UTC
 		public static string Identity(this TodoTask task) =>
@@ -36,8 +71,18 @@ namespace Jeeves
 			task.Recurrence;
 		public static bool IsDaily(this TodoTask task) =>
 			task.Recurrence() != null;
+		public static TimeSpan RecurrenceInterval(this TodoTask task)
+        {
+			if (task.Recurrence().Pattern.Type != RecurrencePatternType.Daily)
+				throw new NotImplementedException($"Recurrence Pattern {task.Recurrence().Pattern.Type} not yet supported.");
+			int? interval = task.Recurrence().Pattern.Interval;
+			if (!interval.HasValue)
+				throw new ArgumentException($"Daily recurrance requires interval.");
+			return (int)interval * new TimeSpan(24, 0, 0);
+        }
 
 		// Assumes task has already been checked for good format and no null fields
+		// todo returns an enumerable of Jobs because of repeatable tasks
 		public static Job ToScheduleJob(this TodoTask task, UserPreferences preferences) =>
 			new Job
 			{
@@ -48,7 +93,17 @@ namespace Jeeves
 				Deadline = preferences.ToScheduleTime(task.Deadline()),
 				Value = preferences.ValueByCategory(task.Category(), task.IsDaily(), task.CreatedTime(), task.CompletedTime())
 			};
-		private static void CheckForNullJobField(this TodoTask task)
+		public static IEnumerable<Job> ToScheduleJobs(this TodoTask task, UserPreferences preferences) =>
+			task.RepeatWithinWorkWindow(preferences)
+				.Select(task => task.ToScheduleJob(preferences));
+        public static IEnumerable<TodoTask> RepeatWithinWorkWindow(this TodoTask task, UserPreferences preferences)
+        {
+            if (!preferences.WithinWorkWindow(task.ReleaseDate())) return new List<TodoTask>();
+            else return RepeatWithinWorkWindow(
+                task.IncrementByInterval(task.RecurrenceInterval()), preferences).Append(task);
+        }
+
+        private static void CheckForNullJobField(this TodoTask task)
 		{
 			if (task.Category() is null)
 				throw new ArgumentNullException("'Category'");
@@ -68,6 +123,8 @@ namespace Jeeves
 
 		public static DateTime ToUTC(this DateTimeTimeZone time) =>
 			TimeZoneInfo.ConvertTimeToUtc(DateTime.Parse(time.DateTime), TimeZoneInfo.FindSystemTimeZoneById(time.TimeZone));
+		public static DateTimeTimeZone FromUTC(this DateTime utcTime) =>
+			new DateTimeTimeZone { DateTime = utcTime.ToString(), TimeZone = "UTC" };
 
 
 		public delegate int RealDateTimeConverter(DateTime realTime);

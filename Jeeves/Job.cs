@@ -79,11 +79,6 @@ namespace Jeeves
             message = unequalProperty.Item2;
             return !unequalProperty.Item1;
         }
-        private bool AssignString(string input, out string output)
-        {
-            output = input;
-            return true;
-        }
         public override string ToString()
         {
             return $"{{Identity:{Identity}, ReleaseTime{ReleaseTime}, ProcessTime{ProcessTime}, DueDate{DueDate}, Deadline{Deadline}, Value{Value}}}";

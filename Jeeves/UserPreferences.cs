@@ -31,6 +31,12 @@ namespace Jeeves
 		public UserPreferences()
 		{
 		}
+		public DateTime WorkWindowStart() =>
+			WorkdayStart;
+		public DateTime WorkWindowEnd() =>
+			WorkdayEnd + day();
+		public bool WithinWorkWindow(DateTime time) =>
+			(WorkWindowStart() <= time) && (time <= WorkWindowEnd());
 
 		public int ToScheduleTime(DateTime time) =>
 			(int)Math.Round(

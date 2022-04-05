@@ -143,26 +143,64 @@ namespace JeevesTest
 			Assert.IsNotNull(accessToken);
 		}
 		[TestMethod]
+		public void SetReleaseDateTest()
+        {
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			Assert.IsNotNull(daily1);
+			DateTime newReleaseDate = daily1.ReleaseDate() + daily1.RecurrenceInterval();
+			daily1 = daily1.SetReleaseDate(newReleaseDate);
+			DateTime expected = new DateTime(2022, 3, 11, 13, 0, 0);
+			Assert.AreEqual(expected, daily1.ReleaseDate());
+        }
+		[TestMethod]
+		public void SetDueDateTest()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			Assert.IsNotNull(daily1);
+			DateTime newDueDate = daily1.DueDate() + daily1.RecurrenceInterval();
+			daily1 = daily1.SetDueDate(newDueDate);
+			DateTime expected = new DateTime(2022, 3, 11, 18, 0, 0);
+			Assert.AreEqual(expected, daily1.DueDate());
+		}
+		[TestMethod]
+		public void SetDeadlineTest()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			Assert.IsNotNull(daily1);
+			DateTime newDeadline = daily1.Deadline() + daily1.RecurrenceInterval();
+			daily1 = daily1.SetDeadline(newDeadline);
+			DateTime expected = new DateTime(2022, 3, 12, 5, 0, 0);
+			Assert.AreEqual(expected, daily1.Deadline());
+		}
+		[TestMethod]
+		public void IncrementByIntervalTest()
+        {
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			Assert.IsNotNull(daily1);
+			daily1 = daily1.IncrementByInterval(daily1.RecurrenceInterval());
+			Assert.AreEqual(new DateTime(2022, 3, 11, 13, 0, 0), daily1.ReleaseDate());
+			Assert.AreEqual(new DateTime(2022, 3, 11, 18, 0, 0), daily1.DueDate());
+			Assert.AreEqual(new DateTime(2022, 3, 12, 5, 0, 0), daily1.Deadline());
+        }
+		[TestMethod]
 		public void TodoTaskToScheduleJobTest0()
 		{
-			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-			Job chore1Job = chore1.ToScheduleJob(prefs);
+			Job chore1Job = daily1.ToScheduleJob(prefs);
 			string json = JsonConvert.SerializeObject(chore1Job);
 			Assert.IsNotNull(json);
 		}
 		[TestMethod]
 		public void TodoTaskToScheduleJobTest1()
 		{
-			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-			Job chore1actual = chore1.ToScheduleJob(prefs);
+			Job chore1actual = daily1.ToScheduleJob(prefs);
 			Job chore1expected = GetJobByIdentity("1");
 			Assert.IsNotNull(chore1expected);
-			//Assert.AreEqual(chore1expected, chore1actual);
 			string message;
 			Assert.IsTrue(chore1actual.Equals(chore1expected, out message), message);
-			// todo use a different equals method that isolates the bad property for ease of debug
 		}
 
 		[TestMethod]
