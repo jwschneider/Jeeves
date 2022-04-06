@@ -11,33 +11,44 @@ namespace Jeeves
 			return JsonConvert.DeserializeObject<UserPreferences>(json);
 		}
 
+		private string timeZone { get; set; }
+		private TimeSpan schedulingFidelity { get; set; }
+		private TimeSpan workdayStart { get; set; }
+		private TimeSpan workdayLength { get; set; }
 
-		public string TimeZone { get; set; }
-		public DateTime WorkdayStart
-		{
-			get { return new DateTime(DateTime.Today.Ticks, DateTimeKind.Unspecified) + _workdayStart.TimeOfDay; }
-			set { _workdayStart = value; }
+		public TimeZoneInfo GetTimeZone() =>
+			TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+		// this all only works for intervals of less than 24 hours
+		private bool withinWorkInterval(TimeSpan timeLocal) =>
+			timeSinceWorkIntervalStart(timeLocal) <= workdayLength;
+		private TimeSpan timeSinceWorkIntervalStart(TimeSpan timeLocal) =>
+			(timeLocal - workdayStart).modTimeSpan(new TimeSpan(24, 0, 0));
+		private TimeSpan timeUntilWorkIntervalStart(TimeSpan timeLocal) =>
+			(workdayStart - timeLocal).modTimeSpan(new TimeSpan(24, 0, 0));
+		// If 'now' is in a workday, returns the date and time of the start of that workday
+		// If 'now' is outside of a workday, returns the date and time of the start of the next workday
+		// argument 'now' is in UTC
+		private DateTime workdayStartUTC(DateTime now) {
+			DateTime nowLocal = TimeZoneInfo.ConvertTimeFromUtc(now, GetTimeZone());
+			DateTime workdayStartLocal = withinWorkInterval(nowLocal.TimeOfDay) ?
+				nowLocal - timeSinceWorkIntervalStart(nowLocal.TimeOfDay) :
+				nowLocal + timeUntilWorkIntervalStart(nowLocal.TimeOfDay);
+			return TimeZoneInfo.ConvertTimeToUtc(workdayStartLocal, GetTimeZone());
 		}
-		public DateTime WorkdayEnd
-		{
-			get { return new DateTime(DateTime.Today.Ticks, DateTimeKind.Unspecified) + _workdayEnd.TimeOfDay; }
-			set { _workdayEnd = value; }
-		}
-		public TimeSpan SchedulingFidelity { get; set; }
 
-		private DateTime _workdayStart;
-		private DateTime _workdayEnd;
+		private DateTime workdayEndUTC(DateTime now) =>
+			workdayStartUTC(now) + workdayLength;
 
 		public UserPreferences()
 		{
 		}
-		public DateTime WorkWindowStart() =>
-			WorkdayStart;
-		public DateTime WorkWindowEnd() =>
-			WorkdayEnd + day();
+		// all public methods which reference time assume that time is given in UTC
 		public bool WithinWorkWindow(DateTime time) =>
-			(WorkWindowStart() <= time) && (time <= WorkWindowEnd());
+			throw new NotImplementedException();
 
+
+		// todo all public facing methods of UserPreferences need to take in an argument 'DateTime now'
+		// in order to define what the realtime workday is. 
 		public int ToScheduleTime(DateTime time) =>
 			(int)Math.Round(
 				(timeSinceWorkdayStart(time).modTimeSpan(day()).clampTimeSpan(TimeSpan.Zero, workdayLength())
@@ -58,17 +69,7 @@ namespace Jeeves
 					"Sim / Flight" => 100,
 					_ => 1 + (DateTime.Now - created).Days
 				};
-		public TimeZoneInfo GetTimeZone() =>
-			TimeZoneInfo.FindSystemTimeZoneById(TimeZone);
 
-		private DateTime workdayStartUTC() =>
-			TimeZoneInfo.ConvertTimeToUtc(WorkdayStart, GetTimeZone());
-
-		private DateTime workdayEndUTC() =>
-			TimeZoneInfo.ConvertTimeToUtc(WorkdayEnd, GetTimeZone());
-
-		private TimeSpan workdayLength() =>
-			workdayEndUTC() - workdayStartUTC();
 
 		private int scheduleWorkdayLength() =>
 			(int)Math.Round(workdayLength() / SchedulingFidelity);

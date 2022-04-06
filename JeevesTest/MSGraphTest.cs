@@ -183,6 +183,17 @@ namespace JeevesTest
 			Assert.AreEqual(new DateTime(2022, 3, 12, 5, 0, 0), daily1.Deadline());
         }
 		[TestMethod]
+		public void RepeatWithinWorkIntervalTest()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			UserPreferences preferences = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
+			IEnumerable<TodoTask> dailies = daily1.RepeatWithinWorkWindow(preferences);
+			Assert.AreEqual(2, dailies.Count());
+			Assert.AreEqual(new DateTime(2022, 3, 10, 13, 0, 0), dailies.ElementAt(0).ReleaseDate());
+			Assert.AreEqual(new DateTime(2022, 3, 11, 13, 0, 0), dailies.ElementAt(1).ReleaseDate());
+		}
+
+		[TestMethod]
 		public void TodoTaskToScheduleJobTest0()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
