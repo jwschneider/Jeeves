@@ -83,24 +83,26 @@ namespace Jeeves
 
 		// Assumes task has already been checked for good format and no null fields
 		// todo returns an enumerable of Jobs because of repeatable tasks
-		public static Job ToScheduleJob(this TodoTask task, UserPreferences preferences) =>
+		public static Job ToScheduleJob(this TodoTask task, UserPreferences preferences, DateTime now) =>
 			new Job
 			{
 				Identity = task.Identity(),
-				ReleaseTime = preferences.ToScheduleTime(task.ReleaseDate()),
+				ReleaseTime = preferences.ToScheduleTime(task.ReleaseDate(), now),
 				ProcessTime = preferences.ToScheduleDuration(task.ProcessTime()),
-				DueDate = preferences.ToScheduleTime(task.DueDate()),
-				Deadline = preferences.ToScheduleTime(task.Deadline()),
-				Value = preferences.ValueByCategory(task.Category(), task.IsDaily(), task.CreatedTime(), task.CompletedTime())
+				DueDate = preferences.ToScheduleTime(task.DueDate(), now),
+				Deadline = preferences.ToScheduleTime(task.Deadline(), now),
+				Value = preferences.ValueByCategory(task.Category(), task.IsDaily(), task.CreatedTime(), task.CompletedTime(), now)
 			};
-		public static IEnumerable<Job> ToScheduleJobs(this TodoTask task, UserPreferences preferences) =>
-			task.RepeatWithinWorkWindow(preferences)
-				.Select(task => task.ToScheduleJob(preferences));
-        public static IEnumerable<TodoTask> RepeatWithinWorkWindow(this TodoTask task, UserPreferences preferences)
+
+		public static IEnumerable<Job> ToScheduleJobs(this TodoTask task, UserPreferences preferences, DateTime now) =>
+			task.RepeatWithinWorkWindow(preferences, now)
+				.Select(task => task.ToScheduleJob(preferences, now));
+
+        public static IEnumerable<TodoTask> RepeatWithinWorkWindow(this TodoTask task, UserPreferences preferences, DateTime now)
         {
-            if (!preferences.WithinWorkWindow(task.ReleaseDate())) return new List<TodoTask>();
+            if (!preferences.WithinWorkWindow(task.ReleaseDate(), now)) return new List<TodoTask>();
             else return RepeatWithinWorkWindow(
-                task.IncrementByInterval(task.RecurrenceInterval()), preferences).Append(task);
+                task.IncrementByInterval(task.RecurrenceInterval()), preferences, now).Append(task);
         }
 
         private static void CheckForNullJobField(this TodoTask task)

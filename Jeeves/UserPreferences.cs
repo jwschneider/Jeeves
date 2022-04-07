@@ -11,28 +11,28 @@ namespace Jeeves
 			return JsonConvert.DeserializeObject<UserPreferences>(json);
 		}
 
-		private string timeZone { get; set; }
-		private TimeSpan schedulingFidelity { get; set; }
-		private TimeSpan workdayStart { get; set; }
-		private TimeSpan workdayLength { get; set; }
-		private int daysInInterval { get; set; }
-		private TimeSpan restTime
+		public string TimeZone { get; set; }
+		public TimeSpan SchedulingFidelity { get; set; }
+		public TimeSpan WorkdayStart { get; set; }
+		public TimeSpan WorkdayLength { get; set; }
+		public int DaysInInterval { get; set; }
+		public TimeSpan RestTime
 		{
 			get
 			{
-				return (workdayStart - (workdayStart + workdayLength).mod(day())).mod(day());
+				return (WorkdayStart - (WorkdayStart + WorkdayLength).mod(day())).mod(day());
 			}
 		}
 
 		public TimeZoneInfo GetTimeZone() =>
-			TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+			TimeZoneInfo.FindSystemTimeZoneById(TimeZone);
 		// this all only works for intervals of less than 24 hours
 		private bool withinWorkInterval(TimeSpan timeLocal) =>
-			timeSinceWorkDayStart(timeLocal) <= workdayLength;
+			timeSinceWorkDayStart(timeLocal) <= WorkdayLength;
 		private TimeSpan timeSinceWorkDayStart(TimeSpan timeLocal) =>
-			(timeLocal - workdayStart).mod(new TimeSpan(24, 0, 0));
+			(timeLocal - WorkdayStart).mod(new TimeSpan(24, 0, 0));
 		private TimeSpan timeUntilWorkdayStart(TimeSpan timeLocal) =>
-			(workdayStart - timeLocal).mod(new TimeSpan(24, 0, 0));
+			(WorkdayStart - timeLocal).mod(new TimeSpan(24, 0, 0));
 		// If 'now' is in a workday, returns the date and time of the start of that workday
 		// If 'now' is outside of a workday, returns the date and time of the start of the next workday
 		// argument 'now' is in UTC
@@ -44,15 +44,17 @@ namespace Jeeves
 			return TimeZoneInfo.ConvertTimeToUtc(workdayStartLocal, GetTimeZone());
 		}
 
+		private int scheduleWorkdayLength() =>
+			(int)Math.Round(WorkdayLength / SchedulingFidelity);
 
-
-
+		private TimeSpan day() =>
+			new TimeSpan(24, 0, 0);
 
 		public UserPreferences()
 		{
 		}
 		// all public methods which reference time assume that time is given in UTC
-		public bool WithinWorkWindow(DateTime time) =>
+		public bool WithinWorkWindow(DateTime time, DateTime now) =>
 			throw new NotImplementedException();
 
 
@@ -63,34 +65,29 @@ namespace Jeeves
 
 		public DateTime FromScheduleTime(int time, DateTime now) =>
 			workIntervalStartUTC(now)
-				+ ((time / scheduleWorkdayLength()) * (workdayLength + restTime))
-				+ (time % scheduleWorkdayLength()) * schedulingFidelity;
+				+ ((time / scheduleWorkdayLength()) * (WorkdayLength + RestTime))
+				+ (time % scheduleWorkdayLength()) * SchedulingFidelity;
 
 		public int ToScheduleDuration(TimeSpan duration) =>
-			scheduleWorkdayLength() * Math.Min(daysInInterval, (int)Math.Floor(duration / (workdayLength + restTime)))
-				+ (int)Math.Round(TimeExtensions.min(workdayLength, duration.mod(workdayLength + restTime)) / schedulingFidelity);
+			scheduleWorkdayLength() * Math.Min(DaysInInterval, (int)Math.Floor(duration / (WorkdayLength + RestTime)))
+				+ (int)Math.Round(TimeExtensions.min(WorkdayLength, duration.mod(WorkdayLength + RestTime)) / SchedulingFidelity);
 
-		//todo
-		public int ValueByCategory(string category, bool isDaily, DateTime created, DateTime? lastCompleted) =>
+		public int ValueByCategory(string category, bool isDaily, DateTime created, DateTime? lastCompleted, DateTime now) =>
 			isDaily ?
-				10 + Math.Min((DateTime.Now - (lastCompleted.HasValue? (DateTime)lastCompleted : DateTime.MinValue)).Days, 10) :
+				10 + Math.Min((now - (lastCompleted.HasValue? (DateTime)lastCompleted : DateTime.MinValue)).Days, 10) :
 				category switch
 				{
 					"Sim / Flight" => 100,
-					_ => 1 + (DateTime.Now - created).Days
+					_ => 1 + (now - created).Days
 				};
 
-		private int scheduleWorkdayLength() =>
-			(int)Math.Round(workdayLength / schedulingFidelity);
 
-		private TimeSpan day() =>
-			new TimeSpan(24, 0, 0);
 
 	}
 	public static class TimeExtensions
     {
 		public static TimeSpan mod(this TimeSpan a, TimeSpan b) =>
-			new TimeSpan(a.Ticks % b.Ticks);
+			new TimeSpan(a.Ticks - (b.Ticks * (long)Math.Floor((double)a.Ticks / b.Ticks)));
 		public static TimeSpan min(this TimeSpan a, TimeSpan b) =>
 			new TimeSpan(Math.Min(a.Ticks, b.Ticks));
 		public static TimeSpan clamp(this TimeSpan a, TimeSpan minValue, TimeSpan maxValue) =>

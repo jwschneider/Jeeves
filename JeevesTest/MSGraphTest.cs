@@ -31,6 +31,12 @@ namespace JeevesTest
 					TypeNameHandling = TypeNameHandling.Auto
 				}));
 
+		private UserPreferences GetSampleUserPreferences() =>
+			UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
+		private DateTime SampleTimeNow() =>
+			new DateTime(2022, 03, 10, 18, 0, 0);
+		private (UserPreferences, DateTime) PreferencesAndTime() =>
+			(GetSampleUserPreferences(), SampleTimeNow());
 
 		public void InitGraphWithSampleData()
 		{
@@ -182,12 +188,14 @@ namespace JeevesTest
 			Assert.AreEqual(new DateTime(2022, 3, 11, 18, 0, 0), daily1.DueDate());
 			Assert.AreEqual(new DateTime(2022, 3, 12, 5, 0, 0), daily1.Deadline());
         }
+
 		[TestMethod]
 		public void RepeatWithinWorkIntervalTest()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			UserPreferences preferences = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-			IEnumerable<TodoTask> dailies = daily1.RepeatWithinWorkWindow(preferences);
+			var (preferences, now) = PreferencesAndTime();
+
+			IEnumerable<TodoTask> dailies = daily1.RepeatWithinWorkWindow(preferences, now);
 			Assert.AreEqual(2, dailies.Count());
 			Assert.AreEqual(new DateTime(2022, 3, 10, 13, 0, 0), dailies.ElementAt(0).ReleaseDate());
 			Assert.AreEqual(new DateTime(2022, 3, 11, 13, 0, 0), dailies.ElementAt(1).ReleaseDate());
@@ -197,17 +205,20 @@ namespace JeevesTest
 		public void TodoTaskToScheduleJobTest0()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-			Job chore1Job = daily1.ToScheduleJob(prefs);
+			var (preferences, now) = PreferencesAndTime();
+
+			Job chore1Job = daily1.ToScheduleJob(preferences, now);
 			string json = JsonConvert.SerializeObject(chore1Job);
+
 			Assert.IsNotNull(json);
 		}
 		[TestMethod]
 		public void TodoTaskToScheduleJobTest1()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-			Job chore1actual = daily1.ToScheduleJob(prefs);
+			var (preferences, now) = PreferencesAndTime();
+
+			Job chore1actual = daily1.ToScheduleJob(preferences, now);
 			Job chore1expected = GetJobByIdentity("1");
 			Assert.IsNotNull(chore1expected);
 			string message;
