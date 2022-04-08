@@ -65,7 +65,8 @@ namespace Jeeves
 
 		public DateTime FromScheduleTime(int time, DateTime now) =>
 			workIntervalStartUTC(now)
-				+ ((time / scheduleWorkdayLength()) * (WorkdayLength + RestTime))
+				+ (Math.Min(time / scheduleWorkdayLength(), DaysInInterval-1) * (WorkdayLength + RestTime))
+				+ (time / scheduleWorkdayLength() >= DaysInInterval ? 1 : 0) * (WorkdayLength)
 				+ (time % scheduleWorkdayLength()) * SchedulingFidelity;
 
 		public int ToScheduleDuration(TimeSpan duration) =>
@@ -92,6 +93,8 @@ namespace Jeeves
 			new TimeSpan(Math.Min(a.Ticks, b.Ticks));
 		public static TimeSpan clamp(this TimeSpan a, TimeSpan minValue, TimeSpan maxValue) =>
 			new TimeSpan(Math.Clamp(a.Ticks, minValue.Ticks, maxValue.Ticks));
+		public static DateTime ToLocal(this DateTime time, TimeZoneInfo timeZone) =>
+			TimeZoneInfo.ConvertTimeFromUtc(time, timeZone);
 	}
 }
 
