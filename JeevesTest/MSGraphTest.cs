@@ -17,12 +17,12 @@ namespace JeevesTest
 	[TestClass]
 	public class MSGraphTest
 	{
-		public JObject GetSampleTaskLists() =>
+		private JObject GetSampleTaskLists() =>
 			JObject.Parse(System.IO.File.ReadAllText("sampleTasks.json"));
-		public JObject GetSampleJobs() =>
+		private JObject GetSampleJobs() =>
 			JObject.Parse(System.IO.File.ReadAllText("sampleJobs.json"));
 
-		public IEnumerable<TodoTask> GetSampleTasks(JObject sampleTaskLists, string displayName) =>
+		private IEnumerable<TodoTask> GetSampleTasks(JObject sampleTaskLists, string displayName) =>
 			sampleTaskLists["taskLists"].Children()
 				.Where(list => String.Equals(list["displayName"].ToObject<string>(), displayName))
 				.FirstOrDefault()["tasks"]
@@ -35,31 +35,39 @@ namespace JeevesTest
 			UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
 		private DateTime SampleTimeNow() =>
 			new DateTime(2022, 03, 10, 18, 0, 0);
+		private TimeZoneInfo SampleDataTimeZone() =>
+			GetSampleUserPreferences().GetTimeZone();
 		private (UserPreferences, DateTime) PreferencesAndTime() =>
 			(GetSampleUserPreferences(), SampleTimeNow());
 
-		public void InitGraphWithSampleData()
-		{
-
-
-		}
-		public Func<TodoTask, bool> TaskIsNamed(string name) =>
+		private Func<TodoTask, bool> TaskIsNamed(string name) =>
 			(TodoTask task) => String.Equals(task.Title(), name);
 
-		public TodoTask GetTaskByName(string list, string name) =>
+		private TodoTask GetTaskByName(string list, string name) =>
 			GetSampleTasks(GetSampleTaskLists(), list)
 				.Where(TaskIsNamed(name))
 				.FirstOrDefault();
 
-		public Job GetJobByIdentity(string identity) =>
+		private Job GetJobByIdentity(string identity) =>
 			GetSampleJobs()["jobs"]
 				.Children()
 				.Where(job => String.Equals(job["identity"].ToObject<string>(), identity))
 				.Select(job => job.ToObject<Job>())
 				.FirstOrDefault();
 
+
+		public void InitGraphWithSampleData()
+		{
+
+
+		}
+
+		
+
+
 		[TestMethod]
-		public void MSGraphGetSampleDataTest0_JsonToTask()
+		[TestCategory("SampleDataRetrieval")]
+		public void DeserializeTask_SampleTaskTest_IsNotNull()
 		{
 			string json = System.IO.File.ReadAllText("sampleTaskTest.json");
 			TodoTask task = JsonConvert.DeserializeObject<TodoTask>(json, new JsonSerializerSettings
@@ -69,7 +77,8 @@ namespace JeevesTest
 			Assert.IsNotNull(task);
 		}
 		[TestMethod]
-		public void MSGraphGetSampleDataTest1_TaskToJson()
+		[TestCategory("SampleDataRetrieval")]
+		public void SerializeTask_InlineTaskWithExtensions_IsNotNull()
 		{
 			TodoTask task = new TodoTask
 			{
@@ -101,53 +110,74 @@ namespace JeevesTest
 		}
 
 		[TestMethod]
-		public void MSGraphGetSampleDataTest2_TaskFromJson()
+		[TestCategory("SampleDataRetrieval")]
+		public void GetSampleTasks_ThePool_ContainsSampleChore1()
 		{
 			IEnumerable<TodoTask> pool = GetSampleTasks(GetSampleTaskLists(), "The Pool");
-			Assert.IsTrue(pool.Where(TaskIsNamed("SampleChore1")).Any());
+			var containsSampleChore1 = pool.Where(TaskIsNamed("SampleChore1")).Any();
+
+			Assert.IsTrue(containsSampleChore1);
 		}
+
 		[TestMethod]
-		public void MSGraphGetSampleDataTest3_Deadline()
+		[TestCategory("SampleDataRetrieval")]
+		public void GetTaskByName_ThePoolSampleChore1_ReturnsNotNull()
+        {
+			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
+
+			Assert.IsNotNull(chore1);
+		}
+
+		[TestMethod]
+		[TestCategory("TodoTaskExtensions")]
+		public void Deadline_SampleChore1_WorkdayEndToday()
 		{
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
-			Assert.IsNotNull(chore1);
-			//DateTimeTimeZone expected = new DateTimeTimeZone
-			//{
-			//	DateTime = DateTime.Parse("2022-03-12T23:00:00").ToString(),
-			//	TimeZone = "America/Chicago"
-			//};
-			DateTime expected = new DateTime(2022, 03, 11, 5, 0, 0);
+
 			DateTime actual = chore1.Deadline();
-			Assert.IsTrue(DateTime.Equals(expected, actual), $"expected time {expected} but got {actual}");
+
+			DateTime expectedLocal = new DateTime(2022, 03, 10, 23, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, actual);
 		}
+
 		[TestMethod]
-		public void MSGraphGetSampleDataTest4_CreateTime()
+		[TestCategory("TodoTaskExtensions")]
+		public void CreatedTime_SampleChore1_Chore1CreatedTime()
 		{
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
-			Assert.IsNotNull(chore1);
+
 			DateTime actual = chore1.CreatedTime();
-			//DateTimeOffset expected = DateTimeOffset.Parse("2022-03-05 12:00:00 -5:00");
-			DateTime expected = new DateTime(2022, 3, 3, 18, 0, 0);
-			Assert.AreEqual(0, expected.CompareTo(actual));
+
+			DateTime expectedLocal = new DateTime(2022, 3, 3, 12, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, actual);
 		}
+
 		[TestMethod]
-		public void MSGraphGetSampleDataTest5_Recurrance()
+		[TestCategory("TodoTaskExtensions")]
+		public void Recurrance_SampleChore1_DailyRecurrance()
 		{
 			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
-			Assert.IsNotNull(chore1);
+
 			PatternedRecurrence actual = chore1.Recurrence();
+
 			Assert.AreEqual(RecurrencePatternType.Daily, actual.Pattern.Type);
 			Assert.AreEqual(1, actual.Pattern.Interval);
 		}
 
 		[TestMethod]
-		public void MSGraphAuthenticationTest()
+		[TestCategory("TodoTaskExtensions")]
+		public void Recurrance_SampleChore1_1DayInterval()
 		{
-			string[] scope = { "User.Read" };
-			MSGraphAuth provider = new MSGraphAuth(scope);
-			string accessToken = provider.GetTokenAsync(scope).Result;
-			Assert.IsNotNull(accessToken);
+			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
+
+			PatternedRecurrence actual = chore1.Recurrence();
+
+			Assert.AreEqual(1, actual.Pattern.Interval);
 		}
+
+		// todo continue rewriting tests and find a way to separate the todotaskextensiontests with the graph integration tests
 		[TestMethod]
 		public void SetReleaseDateTest()
         {
@@ -232,6 +262,15 @@ namespace JeevesTest
 
 		}
 
+		[TestMethod]
+		[TestCategory("GraphIntegration")]
+		public void MSGraphAuthenticationTest()
+		{
+			string[] scope = { "User.Read" };
+			MSGraphAuth provider = new MSGraphAuth(scope);
+			string accessToken = provider.GetTokenAsync(scope).Result;
+			Assert.IsNotNull(accessToken);
+		}
 	}
 }
 
