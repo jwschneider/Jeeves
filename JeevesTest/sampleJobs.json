@@ -2,11 +2,83 @@
   "jobs": [
     {
       "identity": 1,
-      "value": 10,
+      "value": 11,
       "releaseTime": 0,
       "processTime": 4,
       "dueDate": 20,
       "deadline": 64
+    },
+    {
+      "identity": 2,
+      "value": 10,
+      "releaseTime": 18,
+      "processTime": 3,
+      "dueDate": 24,
+      "deadline": 36
+    },
+    {
+      "identity": 3,
+      "value": 10,
+      "releaseTime": 44,
+      "processTime": 4,
+      "dueDate": 52,
+      "deadline": 64
+    },
+    {
+      "identity": 4,
+      "value": 11,
+      "releaseTime": 0,
+      "processTime": 6,
+      "dueDate": 44,
+      "deadline": 44
+    },
+    {
+      "identity": 5,
+      "value": 10,
+      "releaseTime": 40,
+      "processTime": 8,
+      "dueDate": 64,
+      "deadline": 64
+    },
+    {
+      "identity": 6,
+      "value": 100,
+      "releaseTime": 12,
+      "processTime": 14,
+      "dueDate": 26,
+      "deadline": 64
+    },
+    {
+      "identity": 7,
+      "value": 8,
+      "releaseTime": 0,
+      "processTime": 4,
+      "dueDate": 64,
+      "deadline": 64
+    },
+    {
+      "identity": 9,
+      "value": 3,
+      "releaseTime": 0,
+      "processTime": 8,
+      "dueDate": 128,
+      "deadline": 128
+    },
+    {
+      "identity": 9,
+      "value": 2,
+      "releaseTime": 0,
+      "processTime": 2,
+      "dueDate": 116,
+      "deadline": 116
+    },
+    {
+      "identity": 10,
+      "value": 2,
+      "releaseTime": 0,
+      "processTime": 2,
+      "dueDate": 108,
+      "deadline": 108
     }
   ]
 }

@@ -110,31 +110,31 @@
             "dateTime": "2022-03-11T18:00:00",
             "timeZone": "America/Chicago"
           },
-          "extensions": {
-            "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
-            "$values": [
-              {
-                "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
-                "extensionName": "taskProperties",
-                "additionalData": {
-                  "category": "Errand",
-                  "location": "1733 2nd St S, Meridian, MS 39301",
-                  "releaseDate": {
-                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-10T07:00:00",
-                    "timeZone": "America/Chicago"
-                  },
-                  "processTime": "0:30:00",
-                  "deadline": {
-                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-11T18:00:00",
-                    "TimeZone": "America/Chicago"
+            "extensions": {
+              "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
+              "$values": [
+                {
+                  "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
+                  "extensionName": "taskProperties",
+                  "additionalData": {
+                    "category": "Errand",
+                    "location": "1733 2nd St S, Meridian, MS 39301",
+                    "releaseDate": {
+                      "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
+                      "dateTime": "2022-03-10T07:00:00",
+                      "timeZone": "America/Chicago"
+                    },
+                    "processTime": "0:30:00",
+                    "deadline": {
+                      "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
+                      "DateTime": "2022-03-11T18:00:00",
+                      "TimeZone": "America/Chicago"
+                    }
                   }
                 }
-              }
-            ]
-          }
-        },
+              ]
+            }
+          },
         {
           "title": "SampleErrand2",
           "createdDateTime": "2022-03-09 12:00:00 -6:00",
@@ -225,6 +225,10 @@
             "dateTime": "2022-03-10T12:00:00",
             "timeZone": "America/Chicago"
           },
+          "completedDateTime": {
+            "dateTime": "2022-03-09T09:00:00",
+            "timeZone": "America/Chicago"
+          },
           "recurrence": {
             "pattern": {
               "type": "daily",
@@ -262,6 +266,10 @@
           "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
             "dateTime": "2022-03-10T13:00:00",
+            "timeZone": "America/Chicago"
+          },
+          "completedDateTime": {
+            "dateTime": "2022-03-09T13:00:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
@@ -309,6 +317,10 @@
               "interval": 1
             }
           },
+          "completedDateTime": {
+            "dateTime": "2022-03-09T19:00:00",
+            "timeZone": "America/Chicago"
+          },
           "extensions": {
             "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
             "$values": [
@@ -340,6 +352,10 @@
           "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
             "dateTime": "2022-03-10T18:00:00",
+            "timeZone": "America/Chicago"
+          },
+          "completedDateTime": {
+            "dateTime": "2022-03-08T17:00:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
@@ -379,6 +395,10 @@
           "createdDateTime": "2022-03-10 00:00:00 -6:00",
           "dueDateTime": {
             "dateTime": "2022-03-10T23:00:00",
+            "timeZone": "America/Chicago"
+          },
+          "completedDateTime": {
+            "dateTime": "2022-03-09T22:45:00",
             "timeZone": "America/Chicago"
           },
           "recurrence": {
