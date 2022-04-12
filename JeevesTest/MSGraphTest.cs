@@ -55,6 +55,18 @@ namespace JeevesTest
 				.Select(job => job.ToObject<Job>())
 				.FirstOrDefault();
 
+		private IEnumerable<Job> GetAllSampleJobs() =>
+			GetSampleJobs()["jobs"].Children().Select(job => job.ToObject<Job>());
+
+		private IEnumerable<TodoTask> GetAllSampleTasks() =>
+			GetSampleTaskLists()["taskLists"].Children()
+				.SelectMany(taskList => taskList["tasks"].Children()
+					.Select(task => task.ToObject<TodoTask>(new JsonSerializer
+						{
+							TypeNameHandling = TypeNameHandling.Auto
+						})));
+
+
 
 		public void InitGraphWithSampleData()
 		{
@@ -127,6 +139,26 @@ namespace JeevesTest
 
 			Assert.IsNotNull(chore1);
 		}
+
+		[TestMethod]
+		[TestCategory("SampleDataRetrieval")]
+		public void GetAllSampleTasks_10Tasks()
+        {
+			IEnumerable<TodoTask> tasks = GetAllSampleTasks();
+			int expectedNumberOfTasks = 10;
+
+			Assert.AreEqual(expectedNumberOfTasks, tasks.Count());
+        }
+
+		[TestMethod]
+		[TestCategory("SampleDataRetrieval")]
+		public void GetAllSampleJobs_15Jobs()
+        {
+			IEnumerable<Job> jobs = GetAllSampleJobs();
+			int expectedNumberOfJobs = 15;
+
+			Assert.AreEqual(expectedNumberOfJobs, jobs.Count());
+        }
 
 		[TestMethod]
 		[TestCategory("TodoTaskExtensions")]
@@ -303,6 +335,18 @@ namespace JeevesTest
 		}
 
 		[TestMethod]
+		public void ToScheduleJob_SampleChore1_ContainedByAllJobs()
+        {
+			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
+			var (preferences, now) = PreferencesAndTime();
+
+			Job chore1Job = chore1.ToScheduleJob(preferences, now);
+			List<Job> allJobs = GetAllSampleJobs().ToList();
+
+			CollectionAssert.Contains(allJobs, chore1Job);
+		}
+
+		[TestMethod]
 		public void ToScheduleJobs_SampleChore1_OneJob()
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
@@ -323,6 +367,22 @@ namespace JeevesTest
 			IEnumerable<Job> jobsActual = daily1.ToScheduleJobs(preferences, now);
 			int expectedNumberOfJobs = 2;
 			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
+		}
+
+		[TestMethod]
+		public void ToScheduleJobs_SampleDaily1_ContainedByAllJobs()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			var (preferences, now) = PreferencesAndTime();
+
+			List<Job> jobsActual = daily1.ToScheduleJobs(preferences, now).ToList();
+			Job job0 = jobsActual.ElementAt(0);
+			Job job1 = jobsActual.ElementAt(1);
+			List<Job> allJobs = GetAllSampleJobs().ToList();
+
+
+			CollectionAssert.Contains(allJobs, job0, job0.ToString());
+			CollectionAssert.Contains(allJobs, job1, job1.ToString());
 		}
 
 		[TestMethod]
@@ -366,6 +426,21 @@ namespace JeevesTest
 			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
 		}
 
+
+		[TestMethod]
+		public void ToScheduleJobs_AllTasks_EquivalentToAllJobs()
+        {
+			var (preferences, now) = PreferencesAndTime();
+			IEnumerable<TodoTask> tasks = GetAllSampleTasks();
+
+			IEnumerable<Job> jobsActual = tasks.ToScheduleJobs(preferences, now);
+
+			IEnumerable<Job> jobsExpected = GetAllSampleJobs();
+
+			CollectionAssert.AreEquivalent(jobsExpected.ToList(), jobsActual.ToList());
+		}
+
+
 		[TestMethod]
 		public void GenerateSampleSchedule()
 		{
@@ -375,6 +450,7 @@ namespace JeevesTest
 			IEnumerable<TodoTask> tasks = dailies.UnionBy(pool, task => task.Identity());
 			IEnumerable<Job> jobsActual = tasks.ToScheduleJobs(preferences, now);
 			// todo need setup times before a sample schedule can be generated
+			Assert.Fail();
 		}
 
 

@@ -81,7 +81,7 @@ namespace Jeeves
             (ScheduleState s1, ScheduleState s2) =>
             {
                 ((Job i1, IEnumerable<Job> X1, int ti1), (Job i2, IEnumerable<Job> X2, int ti2)) = (s1, s2);
-                return i1.Equals(i2)
+                return i1.IdenticalTo(i2)
                     && ti1 <= ti2
                     && s1.Value >= s2.Value
                     && X1.Subset(X2.Union(X1.Where((Job j) => j.Deadline - j.ProcessTime >= ti2 + i2.ProcessTime + setup(i2, j))));

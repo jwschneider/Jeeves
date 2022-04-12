@@ -51,19 +51,22 @@ namespace Jeeves
             }
             return jobs;
         }
-        public override bool Equals(object obj)
-        {
-            if (obj is Job)
-            {
-                return String.Equals(((Job)obj).Identity, Identity)
-                    && DateTime.Equals(((Job)obj).ReleaseTime, ReleaseTime)
-                    && TimeSpan.Equals(((Job)obj).ProcessTime, ProcessTime)
-                    && DateTime.Equals(((Job)obj).DueDate, DueDate)
-                    && DateTime.Equals(((Job)obj).Deadline, Deadline)
-                    && ((Job)obj).Value == Value;
-            }
-            else return false;
-        }
+        // two jobs are identical if they have the same identity
+        public bool IdenticalTo(object obj) =>
+            (obj is Job) ?
+                String.Equals(((Job)obj).Identity, Identity) :
+                false;
+
+        // two jobs are equal if they have the same properties, regardless of identity
+        public override bool Equals(object obj) =>
+            (obj is Job) ?
+                DateTime.Equals(((Job)obj).ReleaseTime, ReleaseTime) &&
+                    TimeSpan.Equals(((Job)obj).ProcessTime, ProcessTime) &&
+                    DateTime.Equals(((Job)obj).DueDate, DueDate) &&
+                    DateTime.Equals(((Job)obj).Deadline, Deadline) &&
+                    ((Job)obj).Value == Value :
+                false;
+
         public bool Equals(Job other, out string message)
         {
             string[] jobProperties = new string[] { "Identity", "ReleaseTime", "ProcessTime", "DueDate", "Deadline", "Value" };
@@ -81,7 +84,7 @@ namespace Jeeves
         }
         public override string ToString()
         {
-            return $"{{Identity:{Identity}, ReleaseTime{ReleaseTime}, ProcessTime{ProcessTime}, DueDate{DueDate}, Deadline{Deadline}, Value{Value}}}";
+            return $"{{Identity:{Identity}, ReleaseTime: {ReleaseTime}, ProcessTime: {ProcessTime}, DueDate: {DueDate}, Deadline: {Deadline}, Value: {Value}}}";
         }
     }
 }
