@@ -15,10 +15,12 @@ namespace Jeeves
 			{
 				TypeNameHandling = TypeNameHandling.Auto
 			});
-			return JsonConvert.DeserializeObject<TodoTask>(json, new JsonSerializerSettings
+			TodoTask newTask = JsonConvert.DeserializeObject<TodoTask>(json, new JsonSerializerSettings
 			{
 				TypeNameHandling = TypeNameHandling.Auto
 			});
+			newTask.Id = Guid.NewGuid().ToString();
+			return newTask;
 		}
 		private static TodoTask SetExtensionProperty(this TodoTask task, string property, object value)
 		{
@@ -82,7 +84,6 @@ namespace Jeeves
         }
 
 		// Assumes task has already been checked for good format and no null fields
-		// todo returns an enumerable of Jobs because of repeatable tasks
 		public static Job ToScheduleJob(this TodoTask task, UserPreferences preferences, DateTime now) =>
 			new Job
 			{
@@ -100,7 +101,7 @@ namespace Jeeves
 
         public static IEnumerable<TodoTask> RepeatWithinWorkWindow(this TodoTask task, UserPreferences preferences, DateTime now)
         {
-            if (!preferences.WithinWorkWindow(task.ReleaseDate(), now)) return new List<TodoTask>();
+            if (!preferences.WithinWorkInterval(task.ReleaseDate(), now)) return new List<TodoTask>();
             else return RepeatWithinWorkWindow(
                 task.IncrementByInterval(task.RecurrenceInterval()), preferences, now).Append(task);
         }

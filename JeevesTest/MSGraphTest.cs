@@ -260,7 +260,7 @@ namespace JeevesTest
 
 			IEnumerable<TodoTask> dailies = daily1.RepeatWithinWorkWindow(preferences, now);
 			Assert.AreEqual(2, dailies.Count());
-			TimeSpan actualInterval = dailies.ElementAt(1).ReleaseDate() - dailies.ElementAt(0).ReleaseDate();
+			TimeSpan actualInterval = (dailies.ElementAt(1).ReleaseDate() - dailies.ElementAt(0).ReleaseDate()).abs();
 
 			TimeSpan expectedInterval = new TimeSpan(24, 0, 0);
 			Assert.AreEqual(expectedInterval, actualInterval);
@@ -300,6 +300,44 @@ namespace JeevesTest
 			Assert.IsNotNull(jobExpected, taskName);
 			string message;
 			Assert.IsTrue(jobActual.Equals(jobExpected, out message), taskName + ": " + message);
+		}
+
+		[TestMethod]
+		public void ToScheduleJobs_SampleDaily1_TwoJobs()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			var (preferences, now) = PreferencesAndTime();
+
+			IEnumerable<Job> jobsActual = daily1.ToScheduleJobs(preferences, now);
+			int expectedNumberOfJobs = 2;
+			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
+		}
+
+		[TestMethod]
+		public void ToScheduleJobs_SampleDaily1_ReleaseTimeScheduleWorkdayLengthApart()
+        {
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			var (preferences, now) = PreferencesAndTime();
+
+			IEnumerable<Job> jobsActual = daily1.ToScheduleJobs(preferences, now);
+			int actualInterval = Math.Abs(jobsActual.ElementAt(0).ReleaseTime - jobsActual.ElementAt(1).ReleaseTime);
+			int expectedInterval = 64;
+
+			Assert.AreEqual(expectedInterval, actualInterval);
+		}
+
+		[TestMethod]
+		public void ToScheduleJobs_SampleDaily1_DifferentIdentifiers()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			var (preferences, now) = PreferencesAndTime();
+
+			IEnumerable<Job> jobsActual = daily1.ToScheduleJobs(preferences, now);
+
+			string identifier0 = jobsActual.ElementAt(0).Identity;
+			string identifier1 = jobsActual.ElementAt(1).Identity;
+
+			Assert.AreNotEqual(identifier0, identifier1);
 		}
 
 		[TestMethod]

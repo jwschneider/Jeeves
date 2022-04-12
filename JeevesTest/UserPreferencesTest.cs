@@ -96,6 +96,22 @@ namespace JeevesTest
 			int actual = preferences.ToScheduleTime(timeUTC, now);
 			Assert.AreEqual(expected, actual, description);
 		}
+
+		[DataTestMethod]
+		[DataRow("2022-03-10T07:00:00", true)]
+		[DataRow("2022-03-11T00:00:00", true)]
+		[DataRow("2022-03-11T23:00:00", true)]
+		[DataRow("2022-03-11T23:15:00", false)]
+		[DataRow("2022-03-10T06:45:00", false)]
+		public void WithinWorkInterval(string time, bool expected)
+        {
+			var (preferences, now) = PreferencesAndTime();
+			DateTime timeLocal = DateTime.Parse(time);
+			DateTime timeUTC = TimeZoneInfo.ConvertTimeToUtc(timeLocal, preferences.GetTimeZone());
+
+			bool actual = preferences.WithinWorkInterval(timeUTC, now);
+			Assert.AreEqual(expected, actual, time);
+		}
 	}
 }
 

@@ -54,8 +54,9 @@ namespace Jeeves
 		{
 		}
 		// all public methods which reference time assume that time is given in UTC
-		public bool WithinWorkWindow(DateTime time, DateTime now) =>
-			throw new NotImplementedException();
+		public bool WithinWorkInterval(DateTime time, DateTime now) =>
+			time >= workIntervalStartUTC(now)
+			&& time <= workIntervalStartUTC(now) + (WorkdayLength + RestTime) * (DaysInInterval - 1) + WorkdayLength;
 
 
 		// all public facing methods of UserPreferences need to take in an argument 'DateTime now'
@@ -95,6 +96,8 @@ namespace Jeeves
 			new TimeSpan(Math.Min(a.Ticks, b.Ticks));
 		public static TimeSpan clamp(this TimeSpan a, TimeSpan minValue, TimeSpan maxValue) =>
 			new TimeSpan(Math.Clamp(a.Ticks, minValue.Ticks, maxValue.Ticks));
+		public static TimeSpan abs(this TimeSpan time) =>
+			new TimeSpan(Math.Abs(time.Ticks));
 		public static DateTime ToLocal(this DateTime time, TimeZoneInfo timeZone) =>
 			TimeZoneInfo.ConvertTimeFromUtc(time, timeZone);
 	}
