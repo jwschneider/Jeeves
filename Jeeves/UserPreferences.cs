@@ -70,8 +70,10 @@ namespace Jeeves
 				+ (time % scheduleWorkdayLength()) * SchedulingFidelity;
 
 		public int ToScheduleDuration(TimeSpan duration) =>
-			scheduleWorkdayLength() * Math.Min(DaysInInterval, (int)Math.Floor(duration / (WorkdayLength + RestTime)))
-				+ (int)Math.Round(TimeExtensions.min(WorkdayLength, duration.mod(WorkdayLength + RestTime)) / SchedulingFidelity);
+			Math.Min(
+				scheduleWorkdayLength() * (int)Math.Floor(duration / (WorkdayLength + RestTime))
+					+ (int)Math.Round(TimeExtensions.min(WorkdayLength, duration.mod(WorkdayLength + RestTime)) / SchedulingFidelity),
+				scheduleWorkdayLength() * DaysInInterval);
 
 		public int ValueByCategory(string category, bool isDaily, DateTime created, DateTime? lastCompleted, DateTime now) =>
 			isDaily ?

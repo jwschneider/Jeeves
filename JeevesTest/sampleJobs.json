@@ -46,7 +46,7 @@
       "releaseTime": 12,
       "processTime": 14,
       "dueDate": 26,
-      "deadline": 64
+      "deadline": 26
     },
     {
       "identity": 7,
@@ -57,7 +57,7 @@
       "deadline": 64
     },
     {
-      "identity": 9,
+      "identity": 8,
       "value": 3,
       "releaseTime": 0,
       "processTime": 8,

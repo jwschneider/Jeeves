@@ -135,71 +135,39 @@
               ]
             }
           },
-        {
-          "title": "SampleErrand2",
-          "createdDateTime": "2022-03-09 12:00:00 -6:00",
-          "dueDateTime": {
-            "dateTime": "2022-03-11T18:00:00",
-            "timeZone": "America/Chicago"
-          },
-          "extensions": {
-            "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
-            "$values": [
-              {
-                "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
-                "extensionName": "taskProperties",
-                "additionalData": {
-                  "category": "Errand",
-                  "location": "1733 2nd St S, Meridian, MS 39301",
-                  "releaseDate": {
-                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-10T07:00:00",
-                    "timeZone": "America/Chicago"
-                  },
-                  "processTime": "0:30:00",
-                  "deadline": {
-                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-11T18:00:00",
-                    "TimeZone": "America/Chicago"
+          {
+            "title": "SampleFlight",
+            "id": "6",
+            "createdDateTime": "2022-03-09 18:00:00 -6:00",
+            "dueDateTime": {
+              "dateTime": "2022-03-10T13:30:00",
+              "timeZone": "America/Chicago"
+            },
+            "extensions": {
+              "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
+              "$values": [
+                {
+                  "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
+                  "extensionName": "taskProperties",
+                  "additionalData": {
+                    "category": "Sim / Flight",
+                    "location": "255 Rosenbaum Ave, Meridian, MS 39309",
+                    "releaseDate": {
+                      "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
+                      "dateTime": "2022-03-10T10:00:00",
+                      "timeZone": "America/Chicago"
+                    },
+                    "processTime": "3:30:00",
+                    "deadline": {
+                      "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
+                      "DateTime": "2022-03-10T13:30:00",
+                      "TimeZone": "America/Chicago"
+                    }
                   }
                 }
-              }
-            ]
+              ]
+            }
           }
-        },
-        {
-          "title": "SampleFlight",
-          "id": "6",
-          "createdDateTime": "2022-03-09 18:00:00 -6:00",
-          "dueDateTime": {
-            "dateTime": "2022-03-11T13:30:00",
-            "timeZone": "America/Chicago"
-          },
-          "extensions": {
-            "$type": "Microsoft.Graph.TodoTaskExtensionsCollectionPage, Microsoft.Graph",
-            "$values": [
-              {
-                "$type": "Microsoft.Graph.OpenTypeExtension, Microsoft.Graph",
-                "extensionName": "taskProperties",
-                "additionalData": {
-                  "category": "Sim / Flight",
-                  "location": "255 Rosenbaum Ave, Meridian, MS 39309",
-                  "releaseDate": {
-                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "dateTime": "2022-03-10T10:00:00",
-                    "timeZone": "America/Chicago"
-                  },
-                  "processTime": "2:30:00",
-                  "deadline": {
-                    "$type": "Microsoft.Graph.DateTimeTimeZone, Microsoft.Graph",
-                    "DateTime": "2022-03-11T13:30:00",
-                    "TimeZone": "America/Chicago"
-                  }
-                }
-              }
-            ]
-          }
-        }
       ]
     },
     {

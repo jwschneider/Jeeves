@@ -15,7 +15,7 @@ namespace JeevesTest
 {
 
 	[TestClass]
-	public class MSGraphTest
+	public class TodoTaskExtensionsTest
 	{
 		private JObject GetSampleTaskLists() =>
 			JObject.Parse(System.IO.File.ReadAllText("sampleTasks.json"));
@@ -156,7 +156,7 @@ namespace JeevesTest
 
 		[TestMethod]
 		[TestCategory("TodoTaskExtensions")]
-		public void Recurrance_SampleChore1_DailyRecurrance()
+		public void Recurrance_SampleDaily1_DailyRecurrance()
 		{
 			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
 
@@ -168,7 +168,7 @@ namespace JeevesTest
 
 		[TestMethod]
 		[TestCategory("TodoTaskExtensions")]
-		public void Recurrance_SampleChore1_1DayInterval()
+		public void Recurrance_SampleDaily1_1DayInterval()
 		{
 			TodoTask chore1 = GetTaskByName("Daily", "SampleDaily1");
 
@@ -177,62 +177,97 @@ namespace JeevesTest
 			Assert.AreEqual(1, actual.Pattern.Interval);
 		}
 
-		// todo continue rewriting tests and find a way to separate the todotaskextensiontests with the graph integration tests
 		[TestMethod]
-		public void SetReleaseDateTest()
+		public void SetReleasedate_SampleDaily1_SetsTomorrow7am()
         {
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			Assert.IsNotNull(daily1);
+
 			DateTime newReleaseDate = daily1.ReleaseDate() + daily1.RecurrenceInterval();
 			daily1 = daily1.SetReleaseDate(newReleaseDate);
-			DateTime expected = new DateTime(2022, 3, 11, 13, 0, 0);
-			Assert.AreEqual(expected, daily1.ReleaseDate());
-        }
-		[TestMethod]
-		public void SetDueDateTest()
-		{
-			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			Assert.IsNotNull(daily1);
-			DateTime newDueDate = daily1.DueDate() + daily1.RecurrenceInterval();
-			daily1 = daily1.SetDueDate(newDueDate);
-			DateTime expected = new DateTime(2022, 3, 11, 18, 0, 0);
-			Assert.AreEqual(expected, daily1.DueDate());
-		}
-		[TestMethod]
-		public void SetDeadlineTest()
-		{
-			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			Assert.IsNotNull(daily1);
-			DateTime newDeadline = daily1.Deadline() + daily1.RecurrenceInterval();
-			daily1 = daily1.SetDeadline(newDeadline);
-			DateTime expected = new DateTime(2022, 3, 12, 5, 0, 0);
-			Assert.AreEqual(expected, daily1.Deadline());
-		}
-		[TestMethod]
-		public void IncrementByIntervalTest()
-        {
-			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			Assert.IsNotNull(daily1);
-			daily1 = daily1.IncrementByInterval(daily1.RecurrenceInterval());
-			Assert.AreEqual(new DateTime(2022, 3, 11, 13, 0, 0), daily1.ReleaseDate());
-			Assert.AreEqual(new DateTime(2022, 3, 11, 18, 0, 0), daily1.DueDate());
-			Assert.AreEqual(new DateTime(2022, 3, 12, 5, 0, 0), daily1.Deadline());
+
+			DateTime expectedLocal = new DateTime(2022, 3, 11, 7, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, daily1.ReleaseDate());
         }
 
 		[TestMethod]
-		public void RepeatWithinWorkIntervalTest()
+		public void SetDueDate_SampleDaily1_SetsTomorrowNoon()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+
+			DateTime newDueDate = daily1.DueDate() + daily1.RecurrenceInterval();
+			daily1 = daily1.SetDueDate(newDueDate);
+
+			DateTime expectedLocal = new DateTime(2022, 3, 11, 12, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, daily1.DueDate());
+		}
+
+		[TestMethod]
+		public void SetDeadline_SampleDaily1_SetsTomorrowWorkdayEnd()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+
+			DateTime newDeadline = daily1.Deadline() + daily1.RecurrenceInterval();
+			daily1 = daily1.SetDeadline(newDeadline);
+
+			DateTime expectedLocal = new DateTime(2022, 3, 11, 23, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, daily1.Deadline());
+		}
+
+		[TestMethod]
+		public void IncrementByInterval_SampleDaily1_IncrementsReleaseDateOneDay()
+        {
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+
+			daily1 = daily1.IncrementByInterval(daily1.RecurrenceInterval());
+
+			DateTime expectedLocal = new DateTime(2022, 3, 11, 7, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, daily1.ReleaseDate());
+		}
+
+		[TestMethod]
+		public void IncrementByInterval_SampleDaily1_IncrementsDueDateOneDay()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+
+			daily1 = daily1.IncrementByInterval(daily1.RecurrenceInterval());
+
+			DateTime expectedLocal = new DateTime(2022, 3, 11, 12, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, daily1.DueDate());
+		}
+
+		[TestMethod]
+		public void IncrementByInterval_SampleDaily1_IncrementsDeadlineOneDay()
+		{
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+
+			daily1 = daily1.IncrementByInterval(daily1.RecurrenceInterval());
+
+			DateTime expectedLocal = new DateTime(2022, 3, 11, 23, 0, 0);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, SampleDataTimeZone());
+			Assert.AreEqual(expectedUTC, daily1.Deadline());
+		}
+
+		[TestMethod]
+		public void RepeatWithinWorkInterval_SampleDaily1_RepeatsOnceOneDayApart()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			var (preferences, now) = PreferencesAndTime();
 
 			IEnumerable<TodoTask> dailies = daily1.RepeatWithinWorkWindow(preferences, now);
 			Assert.AreEqual(2, dailies.Count());
-			Assert.AreEqual(new DateTime(2022, 3, 10, 13, 0, 0), dailies.ElementAt(0).ReleaseDate());
-			Assert.AreEqual(new DateTime(2022, 3, 11, 13, 0, 0), dailies.ElementAt(1).ReleaseDate());
+			TimeSpan actualInterval = dailies.ElementAt(1).ReleaseDate() - dailies.ElementAt(0).ReleaseDate();
+
+			TimeSpan expectedInterval = new TimeSpan(24, 0, 0);
+			Assert.AreEqual(expectedInterval, actualInterval);
 		}
 
 		[TestMethod]
-		public void TodoTaskToScheduleJobTest0()
+		public void ToScheduleJob_SampleDaily1_jsonSerializationIsNotNull()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			var (preferences, now) = PreferencesAndTime();
@@ -242,26 +277,43 @@ namespace JeevesTest
 
 			Assert.IsNotNull(json);
 		}
-		[TestMethod]
-		public void TodoTaskToScheduleJobTest1()
+
+		[DataTestMethod]
+		[DataRow("Daily", "SampleDaily1", "1")]
+		[DataRow("Daily", "SampleLunch", "2")]
+		[DataRow("Daily", "SampleDinner", "3")]
+		[DataRow("Daily", "SampleExercise", "4")]
+		[DataRow("Daily", "SampleExecutiveTime", "5")]
+		[DataRow("The Pool", "SampleFlight", "6")]
+		[DataRow("The Pool", "SampleChore1", "7")]
+		[DataRow("The Pool", "SampleChore2", "8")]
+		[DataRow("The Pool", "SampleErrand1", "9")]
+		[DataRow("The Pool", "SampleErrand2", "10")]
+		public void ToScheduleJob(string taskList, string taskName, string identity)
 		{
-			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			TodoTask task = GetTaskByName(taskList, taskName);
 			var (preferences, now) = PreferencesAndTime();
 
-			Job chore1actual = daily1.ToScheduleJob(preferences, now);
-			Job chore1expected = GetJobByIdentity("1");
-			Assert.IsNotNull(chore1expected);
+			Job jobActual = task.ToScheduleJob(preferences, now);
+			Job jobExpected = GetJobByIdentity(identity);
+
+			Assert.IsNotNull(jobExpected, taskName);
 			string message;
-			Assert.IsTrue(chore1actual.Equals(chore1expected, out message), message);
+			Assert.IsTrue(jobActual.Equals(jobExpected, out message), taskName + ": " + message);
 		}
 
 		[TestMethod]
 		public void GenerateSampleSchedule()
 		{
 			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-
+			Assert.Fail();
 		}
 
+
+	}
+	[TestClass]
+	public class MSGraphTest
+    {
 		[TestMethod]
 		[TestCategory("GraphIntegration")]
 		public void MSGraphAuthenticationTest()

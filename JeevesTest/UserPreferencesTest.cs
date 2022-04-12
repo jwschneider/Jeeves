@@ -86,6 +86,7 @@ namespace JeevesTest
 		[DataRow("2022-03-11T06:00:00", 64, "Before workday start next day")]
 		[DataRow("2022-03-11T23:00:00", 128, "Next workday end")]
 		[DataRow("2022-03-12T00:00:00", 128, "Beyond next workday end")]
+		[DataRow("2022-03-13T23:00:00", 128, "Well beyond next workday end")]
 		public void ToScheduleTime(string time, int expected, string description)
 		{
 			var (preferences, now) = PreferencesAndTime();
