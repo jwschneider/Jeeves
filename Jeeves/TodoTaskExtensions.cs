@@ -96,8 +96,13 @@ namespace Jeeves
 			};
 
 		public static IEnumerable<Job> ToScheduleJobs(this TodoTask task, UserPreferences preferences, DateTime now) =>
-			task.RepeatWithinWorkWindow(preferences, now)
+			(task.IsDaily() ?
+					task.RepeatWithinWorkWindow(preferences, now) :
+					new List<TodoTask>().Append(task))
 				.Select(task => task.ToScheduleJob(preferences, now));
+
+		public static IEnumerable<Job> ToScheduleJobs(this IEnumerable<TodoTask> tasks, UserPreferences preferences, DateTime now) =>
+			tasks.SelectMany(task => task.ToScheduleJobs(preferences, now));
 
         public static IEnumerable<TodoTask> RepeatWithinWorkWindow(this TodoTask task, UserPreferences preferences, DateTime now)
         {

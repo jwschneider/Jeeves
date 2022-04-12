@@ -303,6 +303,18 @@ namespace JeevesTest
 		}
 
 		[TestMethod]
+		public void ToScheduleJobs_SampleChore1_OneJob()
+        {
+			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
+			var (preferences, now) = PreferencesAndTime();
+
+			IEnumerable<Job> jobsActual = chore1.ToScheduleJobs(preferences, now);
+			int expectedNumberOfJobs = 1;
+			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
+
+		}
+
+		[TestMethod]
 		public void ToScheduleJobs_SampleDaily1_TwoJobs()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
@@ -341,10 +353,28 @@ namespace JeevesTest
 		}
 
 		[TestMethod]
+		public void ToScheduleJobs_SampleDaily1AndChore1_ThreeJobs()
+        {
+			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
+			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
+			var (preferences, now) = PreferencesAndTime();
+			var tasks = new List<TodoTask>().Append(chore1).Append(daily1);
+
+			IEnumerable<Job> jobsActual = tasks.ToScheduleJobs(preferences, now);
+			int expectedNumberOfJobs = 3;
+
+			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
+		}
+
+		[TestMethod]
 		public void GenerateSampleSchedule()
 		{
-			UserPreferences prefs = UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-			Assert.Fail();
+			var (preferences, now) = PreferencesAndTime();
+			var dailies = GetSampleTasks(GetSampleTaskLists(), "Daily");
+			var pool = GetSampleTasks(GetSampleTaskLists(), "The Pool");
+			IEnumerable<TodoTask> tasks = dailies.UnionBy(pool, task => task.Identity());
+			IEnumerable<Job> jobsActual = tasks.ToScheduleJobs(preferences, now);
+			// todo need setup times before a sample schedule can be generated
 		}
 
 
