@@ -426,7 +426,6 @@ namespace JeevesTest
 			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
 		}
 
-
 		[TestMethod]
 		public void ToScheduleJobs_AllTasks_EquivalentToAllJobs()
         {
@@ -436,8 +435,13 @@ namespace JeevesTest
 			IEnumerable<Job> jobsActual = tasks.ToScheduleJobs(preferences, now);
 
 			IEnumerable<Job> jobsExpected = GetAllSampleJobs();
+			// for some reason CollectionAssert.AreEquivalent(jobsExpected, jobsActual) fails. Maybe job needs to implement GetHashCode
+			var missingJobs = jobsActual.Select(job => (jobsExpected.Contains(job), job.ToString()))
+										.Where(tuple => tuple.Item1 == false)
+										.Select(tuple => tuple.Item2);
+			bool anyMissingJobs = missingJobs.Any();
 
-			CollectionAssert.AreEquivalent(jobsExpected.ToList(), jobsActual.ToList());
+			Assert.IsFalse(anyMissingJobs, missingJobs.FirstOrDefault());
 		}
 
 
