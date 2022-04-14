@@ -95,14 +95,22 @@ namespace Jeeves
 				Value = preferences.ValueByCategory(task.Category(), task.IsDaily(), task.CreatedTime(), task.CompletedTime(), now)
 			};
 
-		public static IEnumerable<Job> ToScheduleJobs(this TodoTask task, UserPreferences preferences, DateTime now) =>
-			(task.IsDaily() ?
-					task.RepeatWithinWorkWindow(preferences, now) :
-					new List<TodoTask>().Append(task))
-				.Select(task => task.ToScheduleJob(preferences, now));
+		//public static IEnumerable<Job> ToScheduleJobs(this TodoTask task, UserPreferences preferences, DateTime now) =>
+		//	(task.IsDaily() ?
+		//			task.RepeatWithinWorkWindow(preferences, now) :
+		//			new List<TodoTask>().Append(task))
+		//		.Select(task => task.ToScheduleJob(preferences, now));
+
+
+		// this had to change because the intermediate expanded collection of tasks is needed
+		// so that the generated jobs have something to refer back to
+		public static IEnumerable<TodoTask> RepeatDailyTask(this TodoTask task, UserPreferences preferences, DateTime now) =>
+			task.IsDaily() ?
+				task.RepeatWithinWorkWindow(preferences, now) :
+				new List<TodoTask>().Append(task);
 
 		public static IEnumerable<Job> ToScheduleJobs(this IEnumerable<TodoTask> tasks, UserPreferences preferences, DateTime now) =>
-			tasks.SelectMany(task => task.ToScheduleJobs(preferences, now));
+			tasks.Select(task => task.ToScheduleJob(preferences, now));
 
         public static IEnumerable<TodoTask> RepeatWithinWorkWindow(this TodoTask task, UserPreferences preferences, DateTime now)
         {

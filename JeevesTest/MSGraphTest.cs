@@ -347,35 +347,36 @@ namespace JeevesTest
 		}
 
 		[TestMethod]
-		public void ToScheduleJobs_SampleChore1_OneJob()
+		public void RepeatDailyTask_SampleChore1_OneJob()
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			var (preferences, now) = PreferencesAndTime();
 
-			IEnumerable<Job> jobsActual = chore1.ToScheduleJobs(preferences, now);
+			var chore1Tasks = chore1.RepeatDailyTask(preferences, now);
 			int expectedNumberOfJobs = 1;
-			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
+			Assert.AreEqual(expectedNumberOfJobs, chore1Tasks.Count());
 
 		}
 
 		[TestMethod]
-		public void ToScheduleJobs_SampleDaily1_TwoJobs()
+		public void RepeatDailyTask_SampleDaily1_TwoJobs()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			var (preferences, now) = PreferencesAndTime();
 
-			IEnumerable<Job> jobsActual = daily1.ToScheduleJobs(preferences, now);
+			var daily1Tasks = daily1.RepeatDailyTask(preferences, now);
 			int expectedNumberOfJobs = 2;
-			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
+			Assert.AreEqual(expectedNumberOfJobs, daily1Tasks.Count());
 		}
 
 		[TestMethod]
-		public void ToScheduleJobs_SampleDaily1_ContainedByAllJobs()
+		public void RepeatDailyTaskToScheduleJobs_SampleDaily1_ContainedByAllJobs()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			var (preferences, now) = PreferencesAndTime();
 
-			List<Job> jobsActual = daily1.ToScheduleJobs(preferences, now).ToList();
+			List<Job> jobsActual = daily1.RepeatDailyTask(preferences, now)
+				.ToScheduleJobs(preferences, now).ToList();
 			Job job0 = jobsActual.ElementAt(0);
 			Job job1 = jobsActual.ElementAt(1);
 			List<Job> allJobs = GetAllSampleJobs().ToList();
@@ -386,12 +387,13 @@ namespace JeevesTest
 		}
 
 		[TestMethod]
-		public void ToScheduleJobs_SampleDaily1_ReleaseTimeScheduleWorkdayLengthApart()
+		public void RepeatDailyTaskToScheduleJobs_SampleDaily1_ReleaseTimeScheduleWorkdayLengthApart()
         {
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			var (preferences, now) = PreferencesAndTime();
 
-			IEnumerable<Job> jobsActual = daily1.ToScheduleJobs(preferences, now);
+			IEnumerable<Job> jobsActual = daily1.RepeatDailyTask(preferences, now)
+				.ToScheduleJobs(preferences, now);
 			int actualInterval = Math.Abs(jobsActual.ElementAt(0).ReleaseTime - jobsActual.ElementAt(1).ReleaseTime);
 			int expectedInterval = 64;
 
@@ -399,40 +401,42 @@ namespace JeevesTest
 		}
 
 		[TestMethod]
-		public void ToScheduleJobs_SampleDaily1_DifferentIdentifiers()
+		public void RepeatDailyTask_SampleDaily1_DifferentIdentifiers()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			var (preferences, now) = PreferencesAndTime();
 
-			IEnumerable<Job> jobsActual = daily1.ToScheduleJobs(preferences, now);
+			var daily1Tasks = daily1.RepeatDailyTask(preferences, now);
 
-			string identifier0 = jobsActual.ElementAt(0).Identity;
-			string identifier1 = jobsActual.ElementAt(1).Identity;
+			string identifier0 = daily1Tasks.ElementAt(0).Identity();
+			string identifier1 = daily1Tasks.ElementAt(1).Identity();
 
 			Assert.AreNotEqual(identifier0, identifier1);
 		}
 
 		[TestMethod]
-		public void ToScheduleJobs_SampleDaily1AndChore1_ThreeJobs()
+		public void RepeatDailyTaskToScheduleJobs_SampleDaily1AndChore1_ThreeJobs()
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
 			var (preferences, now) = PreferencesAndTime();
 			var tasks = new List<TodoTask>().Append(chore1).Append(daily1);
 
-			IEnumerable<Job> jobsActual = tasks.ToScheduleJobs(preferences, now);
+			IEnumerable<Job> jobsActual = tasks.SelectMany(task => task.RepeatDailyTask(preferences, now))
+				.ToScheduleJobs(preferences, now);
 			int expectedNumberOfJobs = 3;
 
 			Assert.AreEqual(expectedNumberOfJobs, jobsActual.Count());
 		}
 
 		[TestMethod]
-		public void ToScheduleJobs_AllTasks_EquivalentToAllJobs()
+		public void RepeatDailyTaskToScheduleJobs_AllTasks_EquivalentToAllJobs()
         {
 			var (preferences, now) = PreferencesAndTime();
 			IEnumerable<TodoTask> tasks = GetAllSampleTasks();
 
-			IEnumerable<Job> jobsActual = tasks.ToScheduleJobs(preferences, now);
+			IEnumerable<Job> jobsActual = tasks.SelectMany(task => task.RepeatDailyTask(preferences, now))
+				.ToScheduleJobs(preferences, now);
 
 			IEnumerable<Job> jobsExpected = GetAllSampleJobs();
 			// for some reason CollectionAssert.AreEquivalent(jobsExpected, jobsActual) fails. Maybe job needs to implement GetHashCode
