@@ -44,10 +44,8 @@ namespace JeevesTest
 	{
 		private UserPreferences GetSampleUserPreferences() =>
 			UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-		private DateTime SampleTimeNow() =>
-			new DateTime(2022, 03, 10, 18, 0, 0);
-		private (UserPreferences, DateTime) PreferencesAndTime() =>
-			(GetSampleUserPreferences(), SampleTimeNow());
+		private DateTime SampleTimeBeforeWorkdayStart() =>
+			new DateTime(2022, 03, 10, 12, 0, 0);
 
 		[TestMethod]
 		public void RestTime_SamplePrefs_ReturnsEightHours()
@@ -68,7 +66,7 @@ namespace JeevesTest
 		[DataRow(128, "2022-03-11T23:00:00", "Next workday end")]
 		public void FromScheduleTime(int time, string expected, string description)
         {
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			DateTime actual = preferences.FromScheduleTime(time, now);
 
@@ -89,7 +87,7 @@ namespace JeevesTest
 		[DataRow("2022-03-13T23:00:00", 128, "Well beyond next workday end")]
 		public void ToScheduleTime(string time, int expected, string description)
 		{
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 			DateTime timeLocal = DateTime.Parse(time);
 			DateTime timeUTC = TimeZoneInfo.ConvertTimeToUtc(timeLocal, preferences.GetTimeZone());
 
@@ -105,7 +103,7 @@ namespace JeevesTest
 		[DataRow("2022-03-10T06:45:00", false)]
 		public void WithinWorkInterval(string time, bool expected)
         {
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 			DateTime timeLocal = DateTime.Parse(time);
 			DateTime timeUTC = TimeZoneInfo.ConvertTimeToUtc(timeLocal, preferences.GetTimeZone());
 

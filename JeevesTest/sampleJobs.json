@@ -2,7 +2,7 @@
   "jobs": [
     {
       "identity": 1,
-      "value": 11,
+      "value": 10,
       "releaseTime": 0,
       "processTime": 4,
       "dueDate": 20,
@@ -50,7 +50,7 @@
     },
     {
       "identity": 7,
-      "value": 8,
+      "value": 7,
       "releaseTime": 0,
       "processTime": 4,
       "dueDate": 64,
@@ -58,7 +58,7 @@
     },
     {
       "identity": 8,
-      "value": 3,
+      "value": 2,
       "releaseTime": 0,
       "processTime": 8,
       "dueDate": 128,
@@ -66,7 +66,7 @@
     },
     {
       "identity": 9,
-      "value": 2,
+      "value": 1,
       "releaseTime": 0,
       "processTime": 2,
       "dueDate": 116,
@@ -74,7 +74,7 @@
     },
     {
       "identity": 10,
-      "value": 2,
+      "value": 1,
       "releaseTime": 0,
       "processTime": 2,
       "dueDate": 108,
@@ -82,7 +82,7 @@
     },
     {
       "identity": 11,
-      "value": 11,
+      "value": 10,
       "releaseTime": 64,
       "processTime": 4,
       "dueDate": 84,

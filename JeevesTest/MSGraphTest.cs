@@ -33,12 +33,12 @@ namespace JeevesTest
 
 		private UserPreferences GetSampleUserPreferences() =>
 			UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
-		private DateTime SampleTimeNow() =>
+		private DateTime SampleTimeBeforeWorkdayStart() =>
+			new DateTime(2022, 03, 10, 12, 0, 0);
+		private DateTime SampleTimeDuringWorkday() =>
 			new DateTime(2022, 03, 10, 18, 0, 0);
 		private TimeZoneInfo SampleDataTimeZone() =>
 			GetSampleUserPreferences().GetTimeZone();
-		private (UserPreferences, DateTime) PreferencesAndTime() =>
-			(GetSampleUserPreferences(), SampleTimeNow());
 
 		private Func<TodoTask, bool> TaskIsNamed(string name) =>
 			(TodoTask task) => String.Equals(task.Title(), name);
@@ -288,7 +288,7 @@ namespace JeevesTest
 		public void RepeatWithinWorkInterval_SampleDaily1_RepeatsOnceOneDayApart()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			IEnumerable<TodoTask> dailies = daily1.RepeatWithinWorkWindow(preferences, now);
 			Assert.AreEqual(2, dailies.Count());
@@ -302,7 +302,7 @@ namespace JeevesTest
 		public void ToScheduleJob_SampleDaily1_jsonSerializationIsNotNull()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			Job chore1Job = daily1.ToScheduleJob(preferences, now);
 			string json = JsonConvert.SerializeObject(chore1Job);
@@ -324,7 +324,7 @@ namespace JeevesTest
 		public void ToScheduleJob(string taskList, string taskName, string identity)
 		{
 			TodoTask task = GetTaskByName(taskList, taskName);
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			Job jobActual = task.ToScheduleJob(preferences, now);
 			Job jobExpected = GetJobByIdentity(identity);
@@ -338,7 +338,7 @@ namespace JeevesTest
 		public void ToScheduleJob_SampleChore1_ContainedByAllJobs()
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			Job chore1Job = chore1.ToScheduleJob(preferences, now);
 			List<Job> allJobs = GetAllSampleJobs().ToList();
@@ -350,7 +350,7 @@ namespace JeevesTest
 		public void RepeatDailyTask_SampleChore1_OneJob()
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			var chore1Tasks = chore1.RepeatDailyTask(preferences, now);
 			int expectedNumberOfJobs = 1;
@@ -362,7 +362,7 @@ namespace JeevesTest
 		public void RepeatDailyTask_SampleDaily1_TwoJobs()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			var daily1Tasks = daily1.RepeatDailyTask(preferences, now);
 			int expectedNumberOfJobs = 2;
@@ -373,7 +373,7 @@ namespace JeevesTest
 		public void RepeatDailyTaskToScheduleJobs_SampleDaily1_ContainedByAllJobs()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			List<Job> jobsActual = daily1.RepeatDailyTask(preferences, now)
 				.ToScheduleJobs(preferences, now).ToList();
@@ -390,7 +390,7 @@ namespace JeevesTest
 		public void RepeatDailyTaskToScheduleJobs_SampleDaily1_ReleaseTimeScheduleWorkdayLengthApart()
         {
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			IEnumerable<Job> jobsActual = daily1.RepeatDailyTask(preferences, now)
 				.ToScheduleJobs(preferences, now);
@@ -404,7 +404,7 @@ namespace JeevesTest
 		public void RepeatDailyTask_SampleDaily1_DifferentIdentifiers()
 		{
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
 			var daily1Tasks = daily1.RepeatDailyTask(preferences, now);
 
@@ -419,7 +419,7 @@ namespace JeevesTest
         {
 			TodoTask chore1 = GetTaskByName("The Pool", "SampleChore1");
 			TodoTask daily1 = GetTaskByName("Daily", "SampleDaily1");
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 			var tasks = new List<TodoTask>().Append(chore1).Append(daily1);
 
 			IEnumerable<Job> jobsActual = tasks.SelectMany(task => task.RepeatDailyTask(preferences, now))
@@ -432,7 +432,7 @@ namespace JeevesTest
 		[TestMethod]
 		public void RepeatDailyTaskToScheduleJobs_AllTasks_EquivalentToAllJobs()
         {
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 			IEnumerable<TodoTask> tasks = GetAllSampleTasks();
 
 			IEnumerable<Job> jobsActual = tasks.SelectMany(task => task.RepeatDailyTask(preferences, now))
@@ -445,14 +445,14 @@ namespace JeevesTest
 										.Select(tuple => tuple.Item2);
 			bool anyMissingJobs = missingJobs.Any();
 
-			Assert.IsFalse(anyMissingJobs, missingJobs.FirstOrDefault());
+			Assert.IsFalse(anyMissingJobs, "Expected jobs did not contain: " + missingJobs.FirstOrDefault());
 		}
 
 
 		[TestMethod]
 		public void GenerateSampleSchedule()
 		{
-			var (preferences, now) = PreferencesAndTime();
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 			var dailies = GetSampleTasks(GetSampleTaskLists(), "Daily");
 			var pool = GetSampleTasks(GetSampleTaskLists(), "The Pool");
 			IEnumerable<TodoTask> tasks = dailies.UnionBy(pool, task => task.Identity());
