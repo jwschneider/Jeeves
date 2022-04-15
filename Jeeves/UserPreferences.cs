@@ -83,12 +83,6 @@ namespace Jeeves
 			return TimeExtensions.min(ret, w + totalWorkInterval);
 		}
 
-		//public DateTime FromScheduleTime(int time, DateTime now) =>
-		//	workIntervalStartUTC(now)
-		//		+ (Math.Min(time / scheduleWorkdayLength(), DaysInInterval-1) * (WorkdayLength + RestTime))
-		//		+ (time / scheduleWorkdayLength() >= DaysInInterval ? 1 : 0) * (WorkdayLength)
-		//		+ (time % scheduleWorkdayLength()) * SchedulingFidelity;
-
 		public int ToScheduleDuration(TimeSpan duration, DateTime now) =>
 			ToScheduleTime(now + duration, now);
 

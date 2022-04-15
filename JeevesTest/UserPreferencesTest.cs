@@ -66,7 +66,7 @@ namespace JeevesTest
 		[DataRow(63, "2022-03-10T22:45:00", "One tick before workday end")]
 		[DataRow(64, "2022-03-11T07:00:00", "Workday start next day")]
 		[DataRow(128, "2022-03-11T23:00:00", "Next workday end")]
-		public void FromScheduleTime(int time, string expected, string description)
+		public void FromScheduleTime_BeforeWorkdayStart(int time, string expected, string description)
         {
 			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 
@@ -76,7 +76,24 @@ namespace JeevesTest
 			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, preferences.GetTimeZone());
 			Assert.AreEqual(expectedUTC, actual, description);
 		}
-		
+
+		[DataTestMethod]
+		[DataRow(0, "2022-03-10T12:00:00", "Now")]
+		[DataRow(1, "2022-03-10T12:15:00", "One schedule tick")]
+		[DataRow(43, "2022-03-10T22:45:00", "One tick before workday end")]
+		[DataRow(44, "2022-03-11T07:00:00", "Workday start next day")]
+		[DataRow(108, "2022-03-11T23:00:00", "Next workday end")]
+		public void FromScheduleTime_DuringWorkday(int time, string expected, string description)
+		{
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeDuringWorkday());
+
+			DateTime actual = preferences.FromScheduleTime(time, now);
+
+			DateTime expectedLocal = DateTime.Parse(expected);
+			DateTime expectedUTC = TimeZoneInfo.ConvertTimeToUtc(expectedLocal, preferences.GetTimeZone());
+			Assert.AreEqual(expectedUTC, actual, description);
+		}
+
 		[DataTestMethod]
 		[DataRow("2022-03-10T07:00:00", 0, "Workday start")]
 		[DataRow("2022-03-10T07:15:00", 1, "One schedule tick")]
