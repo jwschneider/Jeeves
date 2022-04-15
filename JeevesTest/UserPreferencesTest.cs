@@ -94,15 +94,22 @@ namespace JeevesTest
 			DateTime timeUTC = TimeZoneInfo.ConvertTimeToUtc(timeLocal, preferences.GetTimeZone());
 
 			int actual = preferences.ToScheduleTime(timeUTC, now);
-			Assert.AreEqual(expected, actual, description);
+			Assert.AreEqual(expected, actual, description + ": " + time);
 		}
 
 		[DataTestMethod]
-		[DataRow()]
-		public void ToScheduleDuration_DuringWorkday(string timeSpan, int expected, string description)
+		[DataRow("2022-03-10T12:00:00", 0, "Now")]
+		[DataRow("2022-03-10T12:15:00", 1, "Now plus one schedule tick")]
+		//todo
+		public void ToScheduleTime_DuringWorkday(string time, int expected, string description)
         {
-			
-        }
+			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeDuringWorkday());
+			DateTime timeLocal = DateTime.Parse(time);
+			DateTime timeUTC = TimeZoneInfo.ConvertTimeToUtc(timeLocal, preferences.GetTimeZone());
+
+			int actual = preferences.ToScheduleTime(timeUTC, now);
+			Assert.AreEqual(expected, actual, description + ": " + time);
+		}
 
 		[DataTestMethod]
 		[DataRow("2022-03-10T07:00:00", true)]
