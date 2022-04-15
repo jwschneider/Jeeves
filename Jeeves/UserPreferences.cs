@@ -61,8 +61,16 @@ namespace Jeeves
 
 		// all public facing methods of UserPreferences need to take in an argument 'DateTime now'
 		// in order to define what the realtime workday is. 
-		public int ToScheduleTime(DateTime time, DateTime now) =>
-			ToScheduleDuration(time - workIntervalStartUTC(now));
+		public int ToScheduleTime(DateTime time, DateTime now)
+        {
+			var (x, w, q, r, a, m) = (time, workIntervalStartUTC(now), WorkdayLength, RestTime, now, SchedulingFidelity);
+			int n = (int)Math.Floor((x - w) / (q + r));
+			TimeSpan b = (x - w).mod(q + r);
+			int j = a > w ? 1 : 0;
+			double ret = (n * q + TimeExtensions.min(b, q) - j * (a - w)) / m;
+			return Math.Clamp((int)Math.Round(ret), 0, scheduleWorkdayLength() * DaysInInterval);
+        }
+			
 
 		public DateTime FromScheduleTime(int time, DateTime now) =>
 			workIntervalStartUTC(now)

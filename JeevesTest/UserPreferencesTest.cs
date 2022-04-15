@@ -46,6 +46,8 @@ namespace JeevesTest
 			UserPreferences.UserPrefsFromFile("sampleUserPreferences.json");
 		private DateTime SampleTimeBeforeWorkdayStart() =>
 			new DateTime(2022, 03, 10, 12, 0, 0);
+		private DateTime SampleTimeDuringWorkday() =>
+			new DateTime(2022, 3, 10, 18, 0, 0);
 
 		[TestMethod]
 		public void RestTime_SamplePrefs_ReturnsEightHours()
@@ -94,6 +96,13 @@ namespace JeevesTest
 			int actual = preferences.ToScheduleTime(timeUTC, now);
 			Assert.AreEqual(expected, actual, description);
 		}
+
+		[DataTestMethod]
+		[DataRow()]
+		public void ToScheduleDuration_DuringWorkday(string timeSpan, int expected, string description)
+        {
+			
+        }
 
 		[DataTestMethod]
 		[DataRow("2022-03-10T07:00:00", true)]
