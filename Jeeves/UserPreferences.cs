@@ -68,21 +68,29 @@ namespace Jeeves
 			TimeSpan b = (x - w).mod(q + r);
 			int j = a > w ? 1 : 0;
 			double ret = (n * q + TimeExtensions.min(b, q) - j * (a - w)) / m;
-			return Math.Clamp((int)Math.Round(ret), 0, scheduleWorkdayLength() * DaysInInterval);
+			int totalWorkInterval = (int)Math.Round((q - j * (a - w) + (DaysInInterval - 1) * q) / m);
+			return Math.Clamp((int)Math.Round(ret), 0, totalWorkInterval);
         }
 			
+		public DateTime FromScheduleTime(int time, DateTime now)
+		{
+			var (y, w, q, r, a, m) = (time, workIntervalStartUTC(now), WorkdayLength, RestTime, now, SchedulingFidelity);
+			int j = a > w ? 1 : 0;
+			int n = (int)Math.Floor((m * y + j * (a - w)) / q);
+			TimeSpan b = (m * y + j * (a - w)).mod(q);
+			DateTime ret = w + n * (q + r) + b;
+			TimeSpan totalWorkInterval = q + (DaysInInterval - 1) * (q + r);
+			return TimeExtensions.min(ret, w + totalWorkInterval);
+		}
 
-		public DateTime FromScheduleTime(int time, DateTime now) =>
-			workIntervalStartUTC(now)
-				+ (Math.Min(time / scheduleWorkdayLength(), DaysInInterval-1) * (WorkdayLength + RestTime))
-				+ (time / scheduleWorkdayLength() >= DaysInInterval ? 1 : 0) * (WorkdayLength)
-				+ (time % scheduleWorkdayLength()) * SchedulingFidelity;
+		//public DateTime FromScheduleTime(int time, DateTime now) =>
+		//	workIntervalStartUTC(now)
+		//		+ (Math.Min(time / scheduleWorkdayLength(), DaysInInterval-1) * (WorkdayLength + RestTime))
+		//		+ (time / scheduleWorkdayLength() >= DaysInInterval ? 1 : 0) * (WorkdayLength)
+		//		+ (time % scheduleWorkdayLength()) * SchedulingFidelity;
 
-		public int ToScheduleDuration(TimeSpan duration) =>
-			Math.Min(
-				scheduleWorkdayLength() * (int)Math.Floor(duration / (WorkdayLength + RestTime))
-					+ (int)Math.Round(TimeExtensions.min(WorkdayLength, duration.mod(WorkdayLength + RestTime)) / SchedulingFidelity),
-				scheduleWorkdayLength() * DaysInInterval);
+		public int ToScheduleDuration(TimeSpan duration, DateTime now) =>
+			ToScheduleTime(now + duration, now);
 
 		public int ValueByCategory(string category, bool isDaily, DateTime created, DateTime? lastCompleted, DateTime now) =>
 			isDaily ?
@@ -102,6 +110,8 @@ namespace Jeeves
 			new TimeSpan(a.Ticks - (b.Ticks * (long)Math.Floor((double)a.Ticks / b.Ticks)));
 		public static TimeSpan min(this TimeSpan a, TimeSpan b) =>
 			new TimeSpan(Math.Min(a.Ticks, b.Ticks));
+		public static DateTime min(this DateTime a, DateTime b) =>
+			new DateTime(Math.Min(a.Ticks, b.Ticks));
 		public static TimeSpan clamp(this TimeSpan a, TimeSpan minValue, TimeSpan maxValue) =>
 			new TimeSpan(Math.Clamp(a.Ticks, minValue.Ticks, maxValue.Ticks));
 		public static TimeSpan abs(this TimeSpan time) =>

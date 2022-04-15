@@ -89,7 +89,7 @@ namespace Jeeves
 			{
 				Identity = task.Identity(),
 				ReleaseTime = preferences.ToScheduleTime(task.ReleaseDate(), now),
-				ProcessTime = preferences.ToScheduleDuration(task.ProcessTime()),
+				ProcessTime = preferences.ToScheduleDuration(task.ProcessTime(), task.ReleaseDate()),
 				DueDate = preferences.ToScheduleTime(task.DueDate(), now),
 				Deadline = preferences.ToScheduleTime(task.Deadline(), now),
 				Value = preferences.ValueByCategory(task.Category(), task.IsDaily(), task.CreatedTime(), task.CompletedTime(), now)

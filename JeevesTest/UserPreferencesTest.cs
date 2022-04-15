@@ -87,7 +87,7 @@ namespace JeevesTest
 		[DataRow("2022-03-11T23:00:00", 128, "Next workday end")]
 		[DataRow("2022-03-12T00:00:00", 128, "Beyond next workday end")]
 		[DataRow("2022-03-13T23:00:00", 128, "Well beyond next workday end")]
-		public void ToScheduleTime(string time, int expected, string description)
+		public void ToScheduleTime_BeforeWorkday(string time, int expected, string description)
 		{
 			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeBeforeWorkdayStart());
 			DateTime timeLocal = DateTime.Parse(time);
@@ -100,7 +100,14 @@ namespace JeevesTest
 		[DataTestMethod]
 		[DataRow("2022-03-10T12:00:00", 0, "Now")]
 		[DataRow("2022-03-10T12:15:00", 1, "Now plus one schedule tick")]
-		//todo
+		[DataRow("2022-03-10T23:00:00", 44, "Workday End")]
+		[DataRow("2022-03-11T07:00:00", 44, "Next workday start")]
+		[DataRow("2022-03-11T23:00:00", 108, "Next workday end")]
+		[DataRow("2022-03-10T11:00:00", 0, "After workday start before now")]
+		[DataRow("2022-03-11T06:00:00", 44, "Before workday start next day")]
+		[DataRow("2022-03-11T23:00:00", 108, "Next workday end")]
+		[DataRow("2022-03-12T00:00:00", 108, "Beyond next workday end")]
+		[DataRow("2022-03-13T23:00:00", 108, "Well beyond next workday end")]
 		public void ToScheduleTime_DuringWorkday(string time, int expected, string description)
         {
 			var (preferences, now) = (GetSampleUserPreferences(), SampleTimeDuringWorkday());
