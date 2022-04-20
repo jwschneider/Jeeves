@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace Jeeves
 {
@@ -9,21 +11,25 @@ namespace Jeeves
     {
         static void Main(string[] args)
         {
-            CloudInstance cloud = new CloudInstance();
+            ICloudInstance cloud = new MSGraphInstance();
             PeriodicUpdateAsync(cloud).Wait();
 
         }
-        static async Task PeriodicUpdateAsync(CloudInstance cloud)
+        static async Task PeriodicUpdateAsync(ICloudInstance cloud)
         {
             if (await cloud.DetectChangesAsync())
             {
-                (await cloud.PullIncompleteJobsFromCloudAsync())
+                UserPreferences preferences;
+                var tasks = (await cloud.PullIncompleteTasksFromCloudAsync())
+                    .ToDictionary(task => task.Identity());
+                var scheduledTasks = tasks.Values.Select(task => task.ToScheduleJob())
                     .ScheduleJobs()
-                    .PushScheduleToCloudAsync();
+                    .Select(x => (tasks[x.Item1.Identity], preferences.FromScheduleTime(x.Item2)));
+                // todo
             }
         }
 
-        static async Task DailyUpdateAsync(CloudInstance cloud)
+        static async Task DailyUpdateAsync(ICloudInstance cloud)
         {
 
         }
