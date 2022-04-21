@@ -23,7 +23,7 @@ namespace Jeeves
                 var tasks = await cloud.PullIncompleteTasksFromCloudAsync();
                 Func<ITask, Job> toJob = (ITask task) => cloud.ToScheduleJob(task, preferences, now);
                 Func<int, DateTime> fromScheduleTime = (int time) => preferences.FromScheduleTime(time, now);
-                SetupTime setup = await cloud.GenerateSetupTime(tasks);
+                SetupTime setup = await cloud.GenerateSetupTimeAsync(tasks);
                 var schedule = tasks.ScheduleTasks(toJob, fromScheduleTime, setup);
                 await cloud.PushScheduleToCloudAsync(schedule);
             }

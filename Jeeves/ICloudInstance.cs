@@ -12,7 +12,8 @@ namespace Jeeves
 		public Task<bool> DetectChangesAsync();
 		public Task<IEnumerable<ITask>> PullIncompleteTasksFromCloudAsync();
 		public Task PushScheduleToCloudAsync(IEnumerable<(ITask, DateTime)> schedule);
-		public SetupTime GenerateSetupTime(IEnumerable<ITask> tasks);
+		public Task<SetupTime> GenerateSetupTimeAsync(IEnumerable<ITask> tasks);
+		public Job ToScheduleJob(ITask task, UserPreferences preferences, DateTime now);
 	}
 }
 
