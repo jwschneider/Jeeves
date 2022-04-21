@@ -11,38 +11,42 @@ namespace Jeeves
     {
         static void Main(string[] args)
         {
-            ICloudInstance cloud = new MSGraphInstance();
+            ICloudInstance cloud = new MSGraphInstance(GetScope());
             PeriodicUpdateAsync(cloud).Wait();
-
         }
-        static async Task PeriodicUpdateAsync(ICloudInstance cloud)
+        public static async Task PeriodicUpdateAsync(ICloudInstance cloud)
         {
             if (await cloud.DetectChangesAsync())
             {
-                UserPreferences preferences;
-                var tasks = (await cloud.PullIncompleteTasksFromCloudAsync())
-                    .ToDictionary(task => task.Identity());
-                var scheduledTasks = tasks.Values.Select(task => task.ToScheduleJob())
-                    .ScheduleJobs()
-                    .Select(x => (tasks[x.Item1.Identity], preferences.FromScheduleTime(x.Item2)));
-                // todo
+                UserPreferences preferences = GetUserPreferences();
+                DateTime now = DateTime.UtcNow;
+                var tasks = await cloud.PullIncompleteTasksFromCloudAsync();
+                Func<ITask, Job> toJob = (ITask task) => cloud.ToScheduleJob(task, preferences, now);
+                Func<int, DateTime> fromScheduleTime = (int time) => preferences.FromScheduleTime(time, now);
+                SetupTime setup = await cloud.GenerateSetupTime(tasks);
+                var schedule = tasks.ScheduleTasks(toJob, fromScheduleTime, setup);
+                await cloud.PushScheduleToCloudAsync(schedule);
             }
         }
-
-        static async Task DailyUpdateAsync(ICloudInstance cloud)
+        public static async Task DailyUpdateAsync(ICloudInstance cloud)
         {
 
         }
-
-        private static Task<List<Job>> LogAndRemoveCompletedJobs(List<Job> jobs)
+        public static string[] GetScope() =>
+            throw new NotImplementedException();
+        public static UserPreferences GetUserPreferences() =>
+            throw new NotImplementedException();
+        // todo test this
+        public static IEnumerable<(ITask, DateTime)> ScheduleTasks(this IEnumerable<ITask> tasks, Func<ITask, Job> toJob, Func<int, DateTime> fromScheduleTime, SetupTime setup)
         {
-            return null;
-        }
-        private static IEnumerable<(Job, int)> ScheduleJobs(this IEnumerable<Job> jobs) =>
-            Scheduler.Schedule(jobs, null);
-        private static async Task PushScheduleToCloudAsync(this IEnumerable<(Job, int)> jobs)
-        {
-            
+            var map = tasks.ToDictionary(task => task.Identity());
+            return Scheduler.Schedule(tasks.Select(task => toJob(task)), setup)
+                .Select(x =>
+                {
+                    (Job j, int time) = x;
+                    return (map[j.Identity], fromScheduleTime(time));
+                }
+                );
         }
     }
 }
