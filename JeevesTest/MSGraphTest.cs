@@ -466,6 +466,13 @@ namespace JeevesTest
 	[TestClass]
 	public class MSGraphTest
     {
+		private static MSGraphInstance instance;
+		[ClassInitialize]
+		public static void InitGraphClient(TestContext context)
+        {
+			instance = new MSGraphInstance(new string[] { "Tasks.ReadWrite" });
+        }
+
 		[TestMethod]
 		[TestCategory("GraphIntegration")]
 		public void MSGraphAuthenticationTest()
@@ -475,6 +482,17 @@ namespace JeevesTest
 			string accessToken = provider.GetTokenAsync(scope).Result;
 			Assert.IsNotNull(accessToken);
 		}
+		[TestMethod]
+		public void GetTaskListByName_Daily_NotNull()
+        {
+			var dailyTasks = instance.GetTaskListByNameAsync("Daily").Result;
+			Assert.IsNotNull(dailyTasks);
+        }
+		[TestMethod]
+		public void GetTaskListByName_null_ThrowsAggregateException()
+        {
+			Assert.ThrowsExceptionAsync<AggregateException>(() => instance.GetTaskListByNameAsync(null));
+        }
 	}
 }
 
