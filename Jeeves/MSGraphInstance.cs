@@ -37,6 +37,7 @@ namespace Jeeves
 			string id = await GetTaskListIdByNameAsync(name);
 			return await GetTaskListByIdAsync(id);
 		}
+		
 
 
 		public async Task<string> GetTaskListIdByNameAsync(string name) {
@@ -57,14 +58,26 @@ namespace Jeeves
 			// todo fire off all these requests asynchronously, then wait for them all to be complete
 		}
 
-		private async Task<IEnumerable<TodoTask>> GetTaskListByIdAsync(string id) =>
+		public async Task<IEnumerable<TodoTask>> GetTaskListByIdAsync(string id) =>
 			(await client.Me.Todo.Lists[id].Tasks.Request().GetAsync()).AsEnumerable();
-		private async Task CreateTaskById(string listId, TodoTask task) =>
+
+		public async Task CreateTaskByIdAsync(string listId, TodoTask task) =>
 			await client.Me.Todo.Lists[listId].Tasks.Request().AddAsync(task);
-		private async Task UpdateTaskById(string listId, TodoTask task) =>
+
+		public async Task CreateTasksByIdAsync(string listId, IEnumerable<TodoTask> tasks) =>
+			await Task.WhenAll(tasks.Select(task => CreateTaskByIdAsync(listId, task)));
+
+		public async Task UpdateTaskByIdAsync(string listId, TodoTask task) =>
 			await client.Me.Todo.Lists[listId].Tasks[task.Identity()].Request().UpdateAsync(task);
-		private async Task DeleteTaskById(string listId, string taskId) =>
+
+		public async Task UpdateTasksByIdAsync(string listId, IEnumerable<TodoTask> tasks) =>
+			await Task.WhenAll(tasks.Select(task => UpdateTaskByIdAsync(listId, task)));
+
+		public async Task DeleteTaskByIdAsync(string listId, string taskId) =>
 			await client.Me.Todo.Lists[listId].Tasks[taskId].Request().DeleteAsync();
+
+		public async Task DeleteTasksByIdAsync(string listId, IEnumerable<string> taskIds) =>
+			await Task.WhenAll(taskIds.Select(taskId => DeleteTaskByIdAsync(listId, taskId)));
 	}
 }
 

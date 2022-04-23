@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 
 
+
 namespace JeevesTest
 {
 
@@ -473,6 +474,27 @@ namespace JeevesTest
 			instance = new MSGraphInstance(new string[] { "Tasks.ReadWrite" });
         }
 
+		private static void ClearTaskLists(IEnumerable<string> taskListNames)
+		{
+			var taskListIds = Task.WhenAll(taskListNames.Select(name => instance.GetTaskListIdByNameAsync(name))).Result;
+			var result = Task.WhenAll(taskListIds.Select(id => (id, instance.GetTaskListByIdAsync(id)))
+				.Select(x =>
+				{
+					var (id, taskList) = x;
+					return instance.DeleteTasksByIdAsync(id, taskList.Result.Select(task => task.Identity()));
+				}
+				));
+			result.Wait();
+		}
+
+		private static void ClearTaskList(string taskListName)
+        {
+			var taskListId = instance.GetTaskListIdByNameAsync(taskListName).Result;
+			var tasks = instance.GetTaskListByIdAsync(taskListId).Result;
+			var result = instance.DeleteTasksByIdAsync(taskListId, tasks.Select(task => task.Identity()));
+			result.Wait();
+        }
+
 		[TestMethod]
 		[TestCategory("GraphIntegration")]
 		public void MSGraphAuthenticationTest()
@@ -482,17 +504,34 @@ namespace JeevesTest
 			string accessToken = provider.GetTokenAsync(scope).Result;
 			Assert.IsNotNull(accessToken);
 		}
-		[TestMethod]
-		public void GetTaskListByName_Daily_NotNull()
+		[DataTestMethod]
+		[DataRow("Daily")]
+		[DataRow("The Pool")]
+		[DataRow("Today")]
+		[DataRow("Tomorrow")]
+		public void GetTaskListByName_NotNull(string listName)
         {
-			var dailyTasks = instance.GetTaskListByNameAsync("Daily").Result;
-			Assert.IsNotNull(dailyTasks);
+			var tasks = instance.GetTaskListByNameAsync(listName).Result;
+			Assert.IsNotNull(tasks);
         }
 		[TestMethod]
 		public void GetTaskListByName_null_ThrowsAggregateException()
         {
 			Assert.ThrowsExceptionAsync<AggregateException>(() => instance.GetTaskListByNameAsync(null));
         }
+
+		[DataTestMethod]
+		[DataRow("Daily")]
+		[DataRow("The Pool")]
+		[DataRow("Today")]
+		[DataRow("Tomorrow")]
+		public void GetTaskListByName_IsEmpty(string listName)
+        {
+			ClearTaskList(listName);
+			var tasks = instance.GetTaskListByNameAsync(listName).Result;
+			Assert.AreEqual(0, tasks.Count());
+        }
+
 	}
 }
 
